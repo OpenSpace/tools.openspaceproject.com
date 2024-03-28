@@ -11,7 +11,7 @@ node("server-ui") {
     );
   }
 
-  stage("Building")
+  stage("Building") {
     sh(
       script: "npm run build",
       label: "Building"
