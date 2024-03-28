@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground: #000000;
+  --background: #d6d8d9;
+  --background-highlight: #a6a8a9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #ffffff;
+    --background: #121212;
+    --background-highlight: #323232;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+}
+
+h1 {
+  font-size: 24pt;
+  text-align: center;
+}
+
+h2 {
+  font-size: 18pt;
+}
+
+div.card {
+  background: var(--background-highlight)
+}
+
+div.logo-container {
+  text-align: center;
+  width: 50%;
+  margin: auto;
+}
