@@ -4,12 +4,14 @@ node("server-ui") {
     checkout scm;
   }
 
-  stage("Generate") {
+  stage("Install") {
     sh(
       script: "npm install",
       label: "Install packages"
     );
+  }
 
+  stage("Building")
     sh(
       script: "npm run build",
       label: "Building"
