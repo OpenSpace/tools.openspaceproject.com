@@ -269,7 +269,7 @@ function convert(obj: any): config {
       rename(obj.scene, "Scale", "scale");
       if ("scale" in obj.scene) {
         obj.scene.scale = obj.scene.scale[0].value;
-        toNumber(obj.scene, "scale");
+        toNumber(obj.scene, "value");
       }
       rename(obj.scene, "Scale", "scale");
       toNumber(obj.scene, "scale");
