@@ -1,227 +1,14 @@
 import { convertXmlToJson } from "./helper";
 import { Sgct as config } from "./sgct";
 import { validate } from "jsonschema";
+import { rename, toBoolean, toMat4, toNumber, toObject, toString, toVec2,
+  toVec3 } from "./converter_helpers";
 import schema from "./sgct.schema.json";
 
 
-/**
- * Rename the oldKey into newKey for the obj. If the key does not exist, no action is
- * performed.
- */
-function rename(obj: object, oldKey: string, newKey: string) {
-  console.assert(oldKey !== newKey);
-
-  // Check if the old key exists in the object
-  let prop = Object.getOwnPropertyDescriptor(obj, oldKey);
-  if (!prop)  return;
-
-  // Copy the property to the new key
-  Object.defineProperty(obj, newKey, prop);
-
-  // and remove the old key
-  delete (obj as any)[oldKey];
-}
-
-/**
- * Converts the value stored in the key into a string. The value stored at the key must be
- * an object itself.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: 1.0
- *   }
- * }
- * let r = toString(obj, "key");
- * console.assert(r.key === "1.0");
- */
-function toString(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = String(val[0]);
-}
-
-/**
- * Converts the value stored in the key into a number. The value stored at the key must be
- * an object itself.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: "1.0"
- *   }
- * }
- * let r = toNumber(obj, "key");
- * console.assert(r.key === 1.0);
- */
-function toNumber(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = Number(val[0]);
-}
-
-/**
- * Converts the value stored in the key into a boolean. The value stored at the key must
- * be an object itself.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: "true"
- *   }
- * }
- * let r = toBoolean(obj, "key");
- * console.assert(r.key);
- */
-function toBoolean(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = (val[0] === "true");
-}
-
-/**
- * Converts the object contained at the key into a new object containing the keys `x` and
- * `y`.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: { x: 1.0, y: 2.0 }
- *   }
- * }
- * let r = toVec2(obj, "key");
- * console.assert(r.key.x === 1.0);
- * console.assert(r.key.y === 2.0);
- */
-function toVec2(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = {
-    x: Number(val[0]["x"]),
-    y: Number(val[0]["y"])
-  }
-}
-
-/**
- * Converts the object contained at the key into a new object containing the keys `x`,
- * `y`, and `z`.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: { x: 1.0, y: 2.0, z: 3.0 }
- *   }
- * }
- * let r = toVec3(obj, "key");
- * console.assert(r.key.x === 1.0);
- * console.assert(r.key.y === 2.0);
- * console.assert(r.key.z === 3.0);
- */
-function toVec3(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = {
-    x: Number(val[0]["x"]),
-    y: Number(val[0]["y"]),
-    z: Number(val[0]["z"])
-  }
-}
-
-/**
- * Converts the object contained at the key into a new object containing the keys `x0`,
- * `x1`, `x2`, `x3`, `y0`, ..., `w2`, `w3`. The resulting object has all of the values in
- * an array.
- *
- * ```
- * let obj = {
- *   key: {
- *     0: {
- *       x0:  1.0, x1:  2.0, x2:  3.0, x3:  4.0,
- *       y0:  5.0, y1:  6.0, y2:  7.0, y3:  8.0,
- *       z0:  9.0, z1: 10.0, z2: 11.0, z3: 12.0,
- *       w0: 13.0, w1: 14.0, w2: 15.0, w3: 16.0
- *     }
- *   }
- * }
- * let r = toMat4(obj, "key");
- * console.assert(
- *   r.key === {
- *      1.0,  2.0,  3.0,
- *      4.0,  5.0,  6.0,
- *      7.0,  8.0,  9.0,
- *     10.0, 11.0, 12.0,
- *     13.0, 14.0, 15.0
- *   });
- */
-function toMat4(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  let vs = val[0];
-
-  let values = [];
-  toBoolean(obj, "transpose");
-  if ((obj as any)["transpose"]) {
-    values = [
-      Number(vs.x0), Number(vs.x1), Number(vs.x2), Number(vs.x3),
-      Number(vs.y0), Number(vs.y1), Number(vs.y2), Number(vs.y3),
-      Number(vs.z0), Number(vs.z1), Number(vs.z2), Number(vs.z3),
-      Number(vs.w0), Number(vs.w1), Number(vs.w2), Number(vs.w3)
-    ];
-  }
-  else {
-    values = [
-      Number(vs.x0), Number(vs.y0), Number(vs.z0), Number(vs.w0),
-      Number(vs.x1), Number(vs.y1), Number(vs.z1), Number(vs.w1),
-      Number(vs.x2), Number(vs.y2), Number(vs.z2), Number(vs.w2),
-      Number(vs.x3), Number(vs.y3), Number(vs.z3), Number(vs.w3)
-    ];
-  }
-  (obj as any)[key] = values;
-}
-
-/**
- * Converts the object contained at the key into a new object.
- *
- * ```
- * let obj2 = { ... }
- * let obj = {
- *   key: {
- *     0: obj2
- *   }
- * }
- * let r = toObject(obj, "key");
- * console.assert(r.key === obj2);
- */
-function toObject(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
-
-  (obj as any)[key] = val[0];
-}
 
 
-
-function convert(obj: any): config {
+function convertVersion(obj: any): config {
   // The current data version
   const CurrentVersion = 1;
 
@@ -762,26 +549,181 @@ function convert(obj: any): config {
   return obj;
 }
 
+function convertFromMpcdi(obj: any): config {
+  // The current data version
+  const CurrentVersion = 1;
+
+  obj.version = CurrentVersion;
+  obj["masteraddress"] = "DSHOST";
+  obj["firmsync"] = false;
+  obj["users"] = [{
+    "eyeseparation": 0.065,
+    "pos": {"x": 0.0, "y": 0.0, "z": 0.0}
+  }];
+  obj["settings"] = { "display": { "swapinterval": 0 }};
+
+  const nodePrefix = "surface";
+  let warpArray: string[] = [];
+  // Obtain mesh filename
+  if ("files" in obj) {
+    obj.files.forEach((fset: any) => {
+      fset.fileset.forEach((warpFile: any) => {
+        if ("geometryWarpFile" in warpFile) {
+          warpFile.geometryWarpFile.forEach((wFile: any) => {
+            if ("path" in wFile) {
+              warpArray.push(wFile.path[0])
+            }
+          });
+        }
+      });
+    });
+  }
+  let nodes: object[] = [];
+  // Obtain display information for each node
+  if ("display" in obj) {
+    obj.display.forEach((displayElem: any) => {
+      if ("buffer" in displayElem) {
+        displayElem.buffer.forEach((buffElem: any) => {
+          let node: any = {};
+          let windowElem: any = {};
+          if ("id" in buffElem) {
+            let nodeNum = buffElem.id[0];
+            nodeNum = Number(nodeNum.substring(nodePrefix.length));
+            node["address"] = `DSGP${nodeNum}`;
+            node["port"] = 20400 + nodeNum;
+            node["name"] = `DSGP${nodeNum}`;
+            node["swaplock"] = false;
+
+            windowElem["border"] = false;
+            windowElem["fxaa"] = false;
+            windowElem["msaa"] = 1;
+            if ("region" in buffElem) {
+              let region = buffElem["region"][0];
+              windowElem["pos"] = {"x": 0, "y": 0};
+              if ("xResolution" in buffElem && "yResolution" in buffElem) {
+                let x = parseInt(buffElem.xResolution);
+                let y = parseInt(buffElem.yResolution);
+                windowElem["size"] = {"x" : x, "y" : y};
+                //Double the resolution for rendering due to the texture shape(s)
+                windowElem["res"] = {"x" : x * 2, "y" : y * 2};
+              }
+              let viewport: any = {};
+              viewport["tracked"] = true;
+              if (nodeNum <= warpArray.length) {
+                viewport["mesh"] = `mesh/${warpArray[nodeNum - 1]}`
+              }
+              if ("x" in region && "y" in region) {
+                let x = parseFloat(region["x"][0]);
+                let y = parseFloat(region["y"][0]);
+                viewport["pos"] = {"x" : x, "y" : y};
+              }
+              if ("xSize" in region && "ySize" in region) {
+                let xSize = parseFloat(region["xSize"][0]);
+                let ySize = parseFloat(region["ySize"][0]);
+                viewport["size"] = {"x" : xSize, "y" : ySize};
+              }
+
+              let projection: any = {};
+              projection["type"] = "TextureMappedProjection";
+              if ("frustum" in region) {
+                let frustum = region["frustum"][0];
+
+                projection["fov"] = {};
+                if ("downAngle" in frustum) {
+                  projection["fov"].down = Math.abs(parseFloat(frustum.downAngle[0]));
+                }
+                if ("upAngle" in frustum) {
+                  projection["fov"].up = Math.abs(parseFloat(frustum.upAngle[0]));
+                }
+                if ("leftAngle" in frustum) {
+                  projection["fov"].left = Math.abs(parseFloat(frustum.leftAngle[0]));
+                }
+                if ("rightAngle" in frustum) {
+                  projection["fov"].right = Math.abs(parseFloat(frustum.rightAngle[0]));
+                }
+
+                projection["orientation"]= {};
+                if ("yaw" in frustum) {
+                  projection["orientation"].yaw = parseFloat(frustum.yaw[0]);
+                }
+                if ("pitch" in frustum) {
+                  projection["orientation"].pitch = parseFloat(frustum.pitch[0]);
+                }
+                if ("roll" in frustum) {
+                  projection["orientation"].roll = parseFloat(frustum.roll[0]);
+                }
+              }
+
+              viewport["projection"] = projection;
+              windowElem["viewports"] = [];
+              windowElem["viewports"].push(viewport);
+            }
+            node["windows"] = [ windowElem ];
+          }
+          nodes.push(node);
+        });
+      }
+    });
+  }
+  obj["nodes"] = nodes;
+
+  //Remove extra fields from original mpcdi file
+  delete obj.color;
+  delete obj.date;
+  delete obj.files;
+  delete obj.geometry;
+  delete obj.profile;
+  delete obj.display;
+
+  return obj;
+}
+
 
 /**
  * Function to convert any SGCT configuration file into the newest file format.
  * It will automatically detect what the source version is.
  *
  * @param content The content to be converted
- * @param extension The extension of the file from which the content came
+ * @param filename The full name of the file from which the content came
  * @returns The converted files
  */
-export async function convertFile(content: string, extension: string): Promise<string> {
+export async function convertFileVersion(content: string,
+                                         extension: string): Promise<string>
+{
   let converted = {};
+  // let extension = filename.substring(filename.lastIndexOf("."));
 
   if (extension === ".xml") {
     let obj = await convertXmlToJson(content);
-    converted = convert(obj);
+    converted = convertVersion(obj);
   }
   else {
     // Nothing to do now
   }
 
+
+  // Check the result against the JSON schema that we have
+  let result = validate(converted, schema);
+  if (!result.valid) {
+    alert(result.toString());
+  }
+
+  let convertedContent = JSON.stringify(converted, null, 2);
+  return convertedContent;
+}
+
+
+
+/**
+ * Function to convert an old MPCDI format configuration to the newest JSON format.
+ *
+ * @param content The content to be converted
+ * @param filename The full name of the file from which the content came
+ * @returns The converted files
+ */
+export async function convertFileMPCDI(content: string): Promise<string> {
+  let obj = await convertXmlToJson(content);
+  let converted = convertFromMpcdi(obj);
 
   // Check the result against the JSON schema that we have
   let result = validate(converted, schema);

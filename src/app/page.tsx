@@ -1,6 +1,6 @@
 "use client"
 
-import SgctConfig from "./sgct/component";
+import { SgctConfigVersion, SgctConfigMPCDI } from "./sgct/component";
 import Image from "next/image";
 
 
@@ -10,9 +10,15 @@ export default function Page() {
       <h1>OpenSpace Conversion Functions</h1>
 
       <div className="card">
-        <h2>SGCT Configuration Converter</h2>
+        <h2>SGCT Configuration Version Converter</h2>
         <p>This converter is used to update SGCT configuration files from older versions to the newest supported version.</p>
-        <SgctConfig />
+        <SgctConfigVersion />
+      </div>
+
+      <div className="card">
+        <h2>COSM configuration file converter</h2>
+        <p>This converter takes a COSM MPCDI configuration file and converts it into a format that can be loaded by SGCT.</p>
+        <SgctConfigMPCDI />
       </div>
 
       <div className="logo-container">

@@ -9,8 +9,7 @@ async function runTest(testFile: string, expectedFile: string): Promise<boolean>
   let testContent = readFileSync(testFile).toString();
   let expectedContent = readFileSync(expectedFile).toString();
 
-  let extension = testFile.substring(testFile.lastIndexOf("."));
-  let converted = await convertFile(testContent, extension);
+  let converted = await convertFile(testContent, testFile);
   let test = JSON.parse(converted);
   let expected = JSON.parse(expectedContent);
 
