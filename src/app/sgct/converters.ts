@@ -691,7 +691,6 @@ export async function convertFileVersion(content: string,
                                          extension: string): Promise<string>
 {
   let converted = {};
-  // let extension = filename.substring(filename.lastIndexOf("."));
 
   if (extension === ".xml") {
     let obj = await convertXmlToJson(content);

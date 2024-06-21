@@ -23,7 +23,8 @@ export function SgctConfigVersion() {
     try {
       let content = await readFile(file);
 
-      let convertedContent = await convertFileVersion(content, file.name);
+      let extension = file.name.substring(file.name.lastIndexOf("."));
+      let convertedContent = await convertFileVersion(content, extension);
 
       let convertedFilename =
         file.name.substring(0, file.name.lastIndexOf(".")) + ".json";
@@ -42,9 +43,11 @@ export function SgctConfigVersion() {
   return (
     <div>
       <input id="file" type="file" onChange={handleFileChange} accept="*.xml, *.json" />
+      <div>
       {file && (
         <a download={file.name} href={URL.createObjectURL(file)}>Download: {file.name}</a>
       )}
+      </div>
       {error && (
         <div>Fatal error while converting: <br /> {error}</div>
       )}
