@@ -3,21 +3,20 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "predev": "cd src/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
+    "generate": "tsx scripts/generate-types.ts",
+    "predev": "npm run generate",
     "dev": "vite",
-    "prebuild": "cd src/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
+    "prebuild": "npm run generate",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "npx prettier . --check & eslint .",
     "lint-fix": "npx prettier . --write & eslint . --fix",
-    "test": "cd src/sgct/tests && tsc test.ts && node test.js"
+    "test": "tsx src/sgct/tests/test.ts"
   },
   "dependencies": {
     "@mantine/core": "^9.2.1",
     "@mantine/hooks": "^9.2.1",
-    "https": "^1.0.0",
     "json-diff": "^1.0.6",
-    "json-schema-to-typescript": "^13.1.1",
     "jsonschema": "^1.4.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -37,7 +36,9 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "globals": "^17.6.0",
+    "json-schema-to-typescript": "^15.0.4",
     "prettier": "^3.8.3",
+    "tsx": "^4.22.0",
     "typescript": "^5",
     "typescript-eslint": "^8.59.3",
     "vite": "^8.0.13"
