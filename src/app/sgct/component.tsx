@@ -42,7 +42,10 @@ function FileConverter({ convert, accept }: FileConverterProps) {
       return;
     }
 
-    const inputFile = files[0];
+    const [inputFile] = files;
+    if (!inputFile) {
+      return;
+    }
     try {
       const content = await readFile(inputFile);
       const baseName = inputFile.name.substring(0, inputFile.name.lastIndexOf("."));
