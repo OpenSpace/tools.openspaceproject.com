@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint';
 import js from '@eslint/js';
 
 export default tseslint.config(
-  { ignores: ['dist', '.next', 'out'] },
+  { ignores: ['dist', 'out'] },
   {
     extends: [
       js.configs.recommended,

@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "predev": "cd src/app/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
-    "dev": "next dev",
-    "prebuild": "cd src/app/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
-    "build": "next build",
-    "start": "next start",
+    "predev": "cd src/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
+    "dev": "vite",
+    "prebuild": "cd src/sgct && tsc schema-to-typescript.ts && node schema-to-typescript.js",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "npx prettier . --check & eslint .",
     "lint-fix": "npx prettier . --write & eslint . --fix",
-    "test": "cd src/app/sgct/tests && tsc test.ts && node test.js"
+    "test": "cd src/sgct/tests && tsc test.ts && node test.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -21,7 +21,6 @@
     "json-diff": "^1.0.6",
     "json-schema-to-typescript": "^13.1.1",
     "jsonschema": "^1.4.1",
-    "next": "14.0.4",
     "react": "^18",
     "react-dom": "^18",
     "xml2js": "^0.6.2"
@@ -32,6 +31,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/xml2js": "^0.4.14",
+    "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.0.1",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
@@ -44,6 +44,7 @@
     "prettier": "^3.8.3",
     "tailwindcss": "^3.3.0",
     "typescript": "^5",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.3",
+    "vite": "^8.0.13"
   }
 }

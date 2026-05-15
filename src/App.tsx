@@ -1,8 +1,6 @@
-import Image from 'next/image';
-
 import { SgctConfigMPCDI, SgctConfigVersion } from './sgct/component';
 
-export default function Page() {
+export default function App() {
   return (
     <main>
       <h1>OpenSpace Conversion Functions</h1>
@@ -26,12 +24,9 @@ export default function Page() {
       </div>
 
       <div className={'logo-container'}>
-        <Image
-          src={'openspace-horiz-logo.png'}
+        <img
+          src={'/openspace-horiz-logo.png'}
           alt={'OpenSpace Logo'}
-          width={0}
-          height={0}
-          sizes={'100vw'}
           style={{ width: '100%', height: 'auto' }}
         />
       </div>

@@ -1,5 +1,3 @@
-'use client';
-
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { Link } from '@mui/material';
 
