@@ -1,8 +1,10 @@
 import { Card, Text, Title } from '@mantine/core';
 
-import { SgctConfigMPCDI } from './sgct/component';
+import { convertFileMPCDI } from '../util/converters';
 
-export function CosmCard() {
+import { FileConverter } from './FileConverter';
+
+export function CosmConverter() {
   return (
     <Card shadow={'sm'} padding={'md'} radius={'md'} withBorder>
       <Title order={2} mb={'xs'}>
@@ -12,7 +14,7 @@ export function CosmCard() {
         This converter takes a COSM MPCDI configuration file and converts it into a
         format that can be loaded by SGCT.
       </Text>
-      <SgctConfigMPCDI />
+      <FileConverter convert={convertFileMPCDI} accept={'.xml'} />
     </Card>
   );
 }

@@ -1,7 +1,7 @@
 import { Container, Stack, Title } from '@mantine/core';
 
-import { CosmCard } from './ConverterCosm';
-import { SgctVersionCard } from './ConverterXML';
+import { CosmConverter } from './sgct/components/CosmConverter';
+import { SgctVersionConverter } from './sgct/components/SgctVersionConverter';
 
 export default function App() {
   return (
@@ -11,8 +11,8 @@ export default function App() {
       </Title>
 
       <Stack>
-        <SgctVersionCard />
-        <CosmCard />
+        <SgctVersionConverter />
+        <CosmConverter />
       </Stack>
 
       <div className={'logo-container'}>

@@ -1,22 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Anchor, FileInput, Stack, Text } from '@mantine/core';
 
-import { convertFileMPCDI, convertFileVersion } from './converters';
-import { readFile } from './helper';
+import { readFile } from '../util/helper';
 
 type ConverterFn = (content: string, filename: string) => Promise<string>;
 
-async function versionConverter(content: string, filename: string): Promise<string> {
-  const extension = filename.substring(filename.lastIndexOf('.'));
-  return convertFileVersion(content, extension);
-}
-
-interface FileConverterProps {
+interface Props {
   convert: ConverterFn;
   accept: string;
 }
 
-function FileConverter({ convert, accept }: FileConverterProps) {
+export function FileConverter({ convert, accept }: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>();
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
@@ -85,12 +79,4 @@ function FileConverter({ convert, accept }: FileConverterProps) {
       </Text>
     </Stack>
   );
-}
-
-export function SgctConfigVersion() {
-  return <FileConverter convert={versionConverter} accept={'.xml,.json'} />;
-}
-
-export function SgctConfigMPCDI() {
-  return <FileConverter convert={convertFileMPCDI} accept={'.xml'} />;
 }

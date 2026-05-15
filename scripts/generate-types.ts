@@ -4,8 +4,8 @@ import { join } from 'node:path';
 import { compileFromFile } from 'json-schema-to-typescript';
 
 const schemaUrl = 'https://raw.githubusercontent.com/sgct/sgct/master/sgct.schema.json';
-const schemaPath = join(process.cwd(), 'src/sgct/sgct.schema.json');
-const outputPath = join(process.cwd(), 'src/sgct/sgct.d.ts');
+const schemaPath = join(process.cwd(), 'src/sgct/util/sgct.schema.json');
+const outputPath = join(process.cwd(), 'src/sgct/util/sgct.d.ts');
 
 async function main() {
   const response = await fetch(schemaUrl);
