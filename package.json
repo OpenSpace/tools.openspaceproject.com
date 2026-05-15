@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "lint": "npx prettier . --check & eslint .",
     "lint-fix": "npx prettier . --write & eslint . --fix",
-    "test": "tsx src/sgct/tests/test.ts"
+    "test": "tsx tests/test.ts"
   },
   "dependencies": {
     "@mantine/core": "^9.2.1",
