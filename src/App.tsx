@@ -1,6 +1,7 @@
-import { Card, Container, Stack, Text, Title } from '@mantine/core';
+import { Container, Stack, Title } from '@mantine/core';
 
-import { SgctConfigMPCDI, SgctConfigVersion } from './sgct/component';
+import { CosmCard } from './ConverterCosm';
+import { SgctVersionCard } from './ConverterXML';
 
 export default function App() {
   return (
@@ -10,27 +11,8 @@ export default function App() {
       </Title>
 
       <Stack>
-        <Card shadow={'sm'} padding={'md'} radius={'md'} withBorder>
-          <Title order={2} mb={'xs'}>
-            SGCT Configuration Version Converter
-          </Title>
-          <Text mb={'xs'}>
-            This converter is used to update SGCT configuration files from older versions
-            to the newest supported version.
-          </Text>
-          <SgctConfigVersion />
-        </Card>
-
-        <Card shadow={'sm'} padding={'md'} radius={'md'} withBorder>
-          <Title order={2} mb={'xs'}>
-            COSM configuration file converter
-          </Title>
-          <Text mb={'xs'}>
-            This converter takes a COSM MPCDI configuration file and converts it into a
-            format that can be loaded by SGCT.
-          </Text>
-          <SgctConfigMPCDI />
-        </Card>
+        <SgctVersionCard />
+        <CosmCard />
       </Stack>
 
       <div className={'logo-container'}>
