@@ -1,104 +1,84 @@
 "use client"
 
-import React, { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { ChangeEvent } from "react";
 import { convertFileVersion, convertFileMPCDI } from "./converters";
 import { readFile } from "./helper";
 import { Link } from "@mui/material";
 
+type ConverterFn = (content: string, filename: string) => Promise<string>;
 
-export function SgctConfigVersion() {
+async function versionConverter(content: string, filename: string): Promise<string> {
+  const extension = filename.substring(filename.lastIndexOf("."));
+  return convertFileVersion(content, extension);
+}
+
+interface FileConverterProps {
+  convert: ConverterFn;
+  accept: string;
+}
+
+function FileConverter({ convert, accept }: FileConverterProps) {
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<String>();
+  const [error, setError] = useState<string>();
+  const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFile(null);
-    setError("");
-
-    if (!e.target.files) {
+  useEffect(() => {
+    if (!file) {
+      setObjectUrl(null);
       return;
     }
-    console.assert(e.target.files.length === 0 || e.target.files.length === 1);
+    const url = URL.createObjectURL(file);
+    setObjectUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
-    let file = e.target.files[0]
+  const handleFileChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
+    setFile(null);
+    setError(undefined);
+
+    const { files } = e.target;
+    if (!files || files.length === 0) {
+      return;
+    }
+
+    const inputFile = files[0];
     try {
-      let content = await readFile(file);
-
-      let extension = file.name.substring(file.name.lastIndexOf("."));
-      let convertedContent = await convertFileVersion(content, extension);
-
-      let convertedFilename =
-        file.name.substring(0, file.name.lastIndexOf(".")) + ".json";
-      let convertedFile = new File(
-        [convertedContent], convertedFilename, { type: "text/javascript"}
+      const content = await readFile(inputFile);
+      const baseName = inputFile.name.substring(0, inputFile.name.lastIndexOf("."));
+      const convertedContent = await convert(content, inputFile.name);
+      const convertedFile = new File(
+        [convertedContent],
+        `${baseName}.json`,
+        { type: "application/json" }
       );
-
       setFile(convertedFile);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : String(err));
     }
-    catch (e: any) {
-      console.log(e);
-      setError(e.message as string);
-    }
-  }
+  }, [convert]);
 
   return (
     <div>
-      <input id="file" type="file" onChange={handleFileChange} accept="*.xml, *.json" />
+      <input type="file" onChange={handleFileChange} accept={accept} />
       <div>
-      {file && (
-        <a download={file.name} href={URL.createObjectURL(file)}>Download: {file.name}</a>
-      )}
+        {objectUrl && file && (
+          <a download={file.name} href={objectUrl}>Download: {file.name}</a>
+        )}
       </div>
       {error && (
         <div>Fatal error while converting: <br /> {error}</div>
       )}
       <div className="note">If the converted file does not load, please let us know by creating an issue on <Link href="https://github.com/OpenSpace/OpenSpace/issues/new?labels=Type%3A+Bug&title=SGCT%20Config%20Converter%20Error">GitHub</Link> or via <Link href="mailto:support@openspaceproject.com">mail</Link></div>
     </div>
-  )
+  );
+}
+
+export function SgctConfigVersion() {
+  return <FileConverter convert={versionConverter} accept=".xml,.json" />;
 }
 
 export function SgctConfigMPCDI() {
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<String>();
-
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setFile(null);
-    setError("");
-
-    if (!e.target.files) {
-      return;
-    }
-    console.assert(e.target.files.length === 0 || e.target.files.length === 1);
-
-    let file = e.target.files[0]
-    try {
-      let content = await readFile(file);
-
-      let convertedContent = await convertFileMPCDI(content);
-
-      let convertedFilename =
-        file.name.substring(0, file.name.lastIndexOf(".")) + ".json";
-      let convertedFile = new File(
-        [convertedContent], convertedFilename, { type: "text/javascript"}
-      );
-
-      setFile(convertedFile);
-    }
-    catch (e: any) {
-      console.log(e);
-      setError(e.message as string);
-    }
-  }
-
-  return (
-    <div>
-      <input id="file" type="file" onChange={handleFileChange} accept="*.xml, *.json" />
-      {file && (
-        <a download={file.name} href={URL.createObjectURL(file)}>Download: {file.name}</a>
-      )}
-      {error && (
-        <div>Fatal error while converting: <br /> {error}</div>
-      )}
-      <div className="note">If the converted file does not load, please let us know by creating an issue on <Link href="https://github.com/OpenSpace/OpenSpace/issues/new?labels=Type%3A+Bug&title=SGCT%20Config%20Converter%20Error">GitHub</Link> or via <Link href="mailto:support@openspaceproject.com">mail</Link></div>
-    </div>
-  )
+  return <FileConverter convert={convertFileMPCDI} accept=".xml" />;
 }

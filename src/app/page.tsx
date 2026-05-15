@@ -1,5 +1,3 @@
-"use client"
-
 import { SgctConfigVersion, SgctConfigMPCDI } from "./sgct/component";
 import Image from "next/image";
 
