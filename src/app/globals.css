@@ -31,7 +31,7 @@ h2 {
 }
 
 div.card {
-  background: var(--background-highlight)
+  background: var(--background-highlight);
 }
 
 div.logo-container {

@@ -6,8 +6,8 @@ export function rename(obj: object, oldKey: string, newKey: string) {
   console.assert(oldKey !== newKey);
 
   // Check if the old key exists in the object
-  let prop = Object.getOwnPropertyDescriptor(obj, oldKey);
-  if (!prop)  return;
+  const prop = Object.getOwnPropertyDescriptor(obj, oldKey);
+  if (!prop) return;
 
   // Copy the property to the new key
   Object.defineProperty(obj, newKey, prop);
@@ -30,10 +30,10 @@ export function rename(obj: object, oldKey: string, newKey: string) {
  * console.assert(r.key === "1.0");
  */
 export function toString(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
   (obj as any)[key] = String(val[0]);
 }
@@ -52,10 +52,10 @@ export function toString(obj: object, key: string) {
  * console.assert(r.key === 1.0);
  */
 export function toNumber(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
   (obj as any)[key] = Number(val[0]);
 }
@@ -74,12 +74,12 @@ export function toNumber(obj: object, key: string) {
  * console.assert(r.key);
  */
 export function toBoolean(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
-  (obj as any)[key] = (val[0] === "true");
+  (obj as any)[key] = val[0] === 'true';
 }
 
 /**
@@ -97,15 +97,15 @@ export function toBoolean(obj: object, key: string) {
  * console.assert(r.key.y === 2.0);
  */
 export function toVec2(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
   (obj as any)[key] = {
-    x: Number(val[0]["x"]),
-    y: Number(val[0]["y"])
-  }
+    x: Number(val[0]['x']),
+    y: Number(val[0]['y'])
+  };
 }
 
 /**
@@ -124,16 +124,16 @@ export function toVec2(obj: object, key: string) {
  * console.assert(r.key.z === 3.0);
  */
 export function toVec3(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
   (obj as any)[key] = {
-    x: Number(val[0]["x"]),
-    y: Number(val[0]["y"]),
-    z: Number(val[0]["z"])
-  }
+    x: Number(val[0]['x']),
+    y: Number(val[0]['y']),
+    z: Number(val[0]['z'])
+  };
 }
 
 /**
@@ -163,29 +163,52 @@ export function toVec3(obj: object, key: string) {
  *   });
  */
 export function toMat4(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
-  let vs = val[0];
+  const [vs] = val;
 
   let values = [];
-  toBoolean(obj, "transpose");
-  if ((obj as any)["transpose"]) {
+  toBoolean(obj, 'transpose');
+  if ((obj as any)['transpose']) {
     values = [
-      Number(vs.x0), Number(vs.x1), Number(vs.x2), Number(vs.x3),
-      Number(vs.y0), Number(vs.y1), Number(vs.y2), Number(vs.y3),
-      Number(vs.z0), Number(vs.z1), Number(vs.z2), Number(vs.z3),
-      Number(vs.w0), Number(vs.w1), Number(vs.w2), Number(vs.w3)
+      Number(vs.x0),
+      Number(vs.x1),
+      Number(vs.x2),
+      Number(vs.x3),
+      Number(vs.y0),
+      Number(vs.y1),
+      Number(vs.y2),
+      Number(vs.y3),
+      Number(vs.z0),
+      Number(vs.z1),
+      Number(vs.z2),
+      Number(vs.z3),
+      Number(vs.w0),
+      Number(vs.w1),
+      Number(vs.w2),
+      Number(vs.w3)
     ];
-  }
-  else {
+  } else {
     values = [
-      Number(vs.x0), Number(vs.y0), Number(vs.z0), Number(vs.w0),
-      Number(vs.x1), Number(vs.y1), Number(vs.z1), Number(vs.w1),
-      Number(vs.x2), Number(vs.y2), Number(vs.z2), Number(vs.w2),
-      Number(vs.x3), Number(vs.y3), Number(vs.z3), Number(vs.w3)
+      Number(vs.x0),
+      Number(vs.y0),
+      Number(vs.z0),
+      Number(vs.w0),
+      Number(vs.x1),
+      Number(vs.y1),
+      Number(vs.z1),
+      Number(vs.w1),
+      Number(vs.x2),
+      Number(vs.y2),
+      Number(vs.z2),
+      Number(vs.w2),
+      Number(vs.x3),
+      Number(vs.y3),
+      Number(vs.z3),
+      Number(vs.w3)
     ];
   }
   (obj as any)[key] = values;
@@ -205,11 +228,10 @@ export function toMat4(obj: object, key: string) {
  * console.assert(r.key === obj2);
  */
 export function toObject(obj: object, key: string) {
-  if (!(key in obj))  return;
-  let val = (obj as any)[key];
-  if (typeof val !== "object")  throw `Wrong type for key ${key}`;
-  if (val.length !== 1)  throw `Wrong length ${val.length} for key ${key}`;
+  if (!(key in obj)) return;
+  const val = (obj as any)[key];
+  if (typeof val !== 'object') throw `Wrong type for key ${key}`;
+  if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
   (obj as any)[key] = val[0];
 }
-

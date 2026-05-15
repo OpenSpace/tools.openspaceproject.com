@@ -70,27 +70,27 @@ export type Projection =
  *     - `16k`: 16384
  */
 export type Quality =
-  | "low"
-  | "256"
-  | "medium"
-  | "512"
-  | "high"
-  | "1k"
-  | "1024"
-  | "1.5k"
-  | "1536"
-  | "2k"
-  | "2048"
-  | "4k"
-  | "4096"
-  | "8k"
-  | "8192"
-  | "16k"
-  | "16384"
-  | "32k"
-  | "32768"
-  | "64k"
-  | "65536";
+  | 'low'
+  | '256'
+  | 'medium'
+  | '512'
+  | 'high'
+  | '1k'
+  | '1024'
+  | '1.5k'
+  | '1536'
+  | '2k'
+  | '2048'
+  | '4k'
+  | '4096'
+  | '8k'
+  | '8192'
+  | '16k'
+  | '16384'
+  | '32k'
+  | '32768'
+  | '64k'
+  | '65536';
 /**
  * Determines whether the output via Spout is enabled.
  */
@@ -152,27 +152,27 @@ export type Orientation1 = YawPitchRoll | Quaternion;
  *     - `16k`: 16384
  */
 export type Quality1 =
-  | "low"
-  | "256"
-  | "medium"
-  | "512"
-  | "high"
-  | "1k"
-  | "1024"
-  | "1.5k"
-  | "1536"
-  | "2k"
-  | "2048"
-  | "4k"
-  | "4096"
-  | "8k"
-  | "8192"
-  | "16k"
-  | "16384"
-  | "32k"
-  | "32768"
-  | "64k"
-  | "65536";
+  | 'low'
+  | '256'
+  | 'medium'
+  | '512'
+  | 'high'
+  | '1k'
+  | '1024'
+  | '1.5k'
+  | '1536'
+  | '2k'
+  | '2048'
+  | '4k'
+  | '4096'
+  | '8k'
+  | '8192'
+  | '16k'
+  | '16384'
+  | '32k'
+  | '32768'
+  | '64k'
+  | '65536';
 /**
  * Provides a rotation angle (in radians) around the z-axis around which the cylindrical projection is offset into the resulting image.
  */
@@ -198,27 +198,27 @@ export type Radius = number;
  *     - `16k`: 16384
  */
 export type Quality2 =
-  | "low"
-  | "256"
-  | "medium"
-  | "512"
-  | "high"
-  | "1k"
-  | "1024"
-  | "1.5k"
-  | "1536"
-  | "2k"
-  | "2048"
-  | "4k"
-  | "4096"
-  | "8k"
-  | "8192"
-  | "16k"
-  | "16384"
-  | "32k"
-  | "32768"
-  | "64k"
-  | "65536";
+  | 'low'
+  | '256'
+  | 'medium'
+  | '512'
+  | 'high'
+  | '1k'
+  | '1024'
+  | '1.5k'
+  | '1536'
+  | '2k'
+  | '2048'
+  | '4k'
+  | '4096'
+  | '8k'
+  | '8192'
+  | '16k'
+  | '16384'
+  | '32k'
+  | '32768'
+  | '64k'
+  | '65536';
 /**
  * Describes the field of view that is covered by the fisheye projection in degrees. The resulting image will always be a circle, and this value determines how much of a field of view is covered by this circle. Please note specifically that this also includes field-of-view settings >180, in which a larger distortion is applied to the image. The default value is 180.
  */
@@ -236,31 +236,31 @@ export type FieldOfView = number;
  *     - `16k`: 16384
  */
 export type Quality3 =
-  | "low"
-  | "256"
-  | "medium"
-  | "512"
-  | "high"
-  | "1k"
-  | "1024"
-  | "1.5k"
-  | "1536"
-  | "2k"
-  | "2048"
-  | "4k"
-  | "4096"
-  | "8k"
-  | "8192"
-  | "16k"
-  | "16384"
-  | "32k"
-  | "32768"
-  | "64k"
-  | "65536";
+  | 'low'
+  | '256'
+  | 'medium'
+  | '512'
+  | 'high'
+  | '1k'
+  | '1024'
+  | '1.5k'
+  | '1536'
+  | '2k'
+  | '2048'
+  | '4k'
+  | '4096'
+  | '8k'
+  | '8192'
+  | '16k'
+  | '16384'
+  | '32k'
+  | '32768'
+  | '64k'
+  | '65536';
 /**
  * Determines the texture interpolation method that is used by SGCT when reprojecting the cube maps into the final fisheye rendering. The default value is `"linear"`.
  */
-export type Interpolation = "linear" | "cubic";
+export type Interpolation = 'linear' | 'cubic';
 /**
  * Determines the tilt of the "up vector" of the fisheye. With a tilt of `0`, the center of the fisheye image is the apex of the half-sphere that is used to reproject the cube map. A tilted fisheye rendering is useful when projecting on a tilted planetarium dome. A value of `90`, for example, would result in the forward facing direction being at the center of the fisheye circular image. The default value is `0`.
  */
@@ -338,27 +338,27 @@ export type Orientation2 = YawPitchRoll | Quaternion;
  *     - `16k`: 16384
  */
 export type Quality4 =
-  | "low"
-  | "256"
-  | "medium"
-  | "512"
-  | "high"
-  | "1k"
-  | "1024"
-  | "1.5k"
-  | "1536"
-  | "2k"
-  | "2048"
-  | "4k"
-  | "4096"
-  | "8k"
-  | "8192"
-  | "16k"
-  | "16384"
-  | "32k"
-  | "32768"
-  | "64k"
-  | "65536";
+  | 'low'
+  | '256'
+  | 'medium'
+  | '512'
+  | 'high'
+  | '1k'
+  | '1024'
+  | '1.5k'
+  | '1536'
+  | '2k'
+  | '2048'
+  | '4k'
+  | '4096'
+  | '8k'
+  | '8192'
+  | '16k'
+  | '16384'
+  | '32k'
+  | '32768'
+  | '64k'
+  | '65536';
 /**
  * Determines the tilt of the "up vector" of the spherical mirror projection. With a tilt of 0, the center of the spherical mirror image is the apex of the half-sphere that is used to reproject the cube map. The default value is 0.
  */
@@ -446,7 +446,7 @@ export type Tracked = boolean;
 /**
  * Forces this viewport to be rendered with a specific eye, using the corresponding Users eye separation to compute the correct frustum. If this value is not set, the viewport will be rendered according to the parent Window's stereo attribute.
  */
-export type Eye = "center" | "left" | "right";
+export type Eye = 'center' | 'left' | 'right';
 /**
  * The name of the User that this viewport should be linked to. If a viewport is linked to a user that has a sensor, the positions of the sensor will be automatically reflected in the user position that is used to render this viewport. The default is that no user is linked with this viewport.
  */
@@ -475,7 +475,7 @@ export type Tags = string[];
  *     - `16ui`: `GL_RGBA16UI`, `GL_UNSIGNED_SHORT`
  *     - `32ui`: `GL_RGBA32UI`, `GL_UNSIGNED_INT`
  */
-export type BufferBitDepth = "8" | "16" | "16f" | "32f" | "16i" | "32i" | "16ui" | "32ui";
+export type BufferBitDepth = '8' | '16' | '16f' | '32f' | '16i' | '32i' | '16ui' | '32ui';
 /**
  * Determines whether the window should be created in an exclusive fullscreen mode. The `size` of this window will be used to set the screen resolution if this value is `true`. See also the `monitor` attribute to determine which monitor should be used as the target for the fullscreen window. The default value is `false`.
  */
@@ -570,23 +570,23 @@ export type Monitor = number;
  *     14. `top_bottom_inverted`: The same as `top_bottom`, but with the left and right eyes flipped.
  */
 export type Stereo =
-  | "none"
-  | "no_stereo"
-  | "active"
-  | "quadbuffer"
-  | "checkerboard"
-  | "checkerboard_inverted"
-  | "anaglyph_red_cyan"
-  | "anaglyph_amber_blue"
-  | "anaglyph_wimmer"
-  | "vertical_interlaced"
-  | "vertical_interlaced_inverted"
-  | "test"
-  | "dummy"
-  | "side_by_side"
-  | "side_by_side_inverted"
-  | "top_bottom"
-  | "top_bottom_inverted";
+  | 'none'
+  | 'no_stereo'
+  | 'active'
+  | 'quadbuffer'
+  | 'checkerboard'
+  | 'checkerboard_inverted'
+  | 'anaglyph_red_cyan'
+  | 'anaglyph_amber_blue'
+  | 'anaglyph_wimmer'
+  | 'vertical_interlaced'
+  | 'vertical_interlaced_inverted'
+  | 'test'
+  | 'dummy'
+  | 'side_by_side'
+  | 'side_by_side_inverted'
+  | 'top_bottom'
+  | 'top_bottom_inverted';
 /**
  * If this value is specified, a configuration file from Scalable Mesh will be used to fill in many of the values of this window instead, such as the window resolution, location, state of full screen etc. See the specific documentation for Scalable Meshes for more information.
  */
@@ -1001,7 +1001,7 @@ export interface CylindricalProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "CylindricalProjection";
+  type: 'CylindricalProjection';
   quality?: Quality1;
   rotation?: Rotation;
   heightoffset?: HeightOffset;
@@ -1014,7 +1014,7 @@ export interface EquirectangularProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "EquirectangularProjection";
+  type: 'EquirectangularProjection';
   quality?: Quality2;
 }
 /**
@@ -1024,7 +1024,7 @@ export interface FisheyeProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "FisheyeProjection";
+  type: 'FisheyeProjection';
   fov?: FieldOfView;
   quality?: Quality3;
   interpolation?: Interpolation;
@@ -1068,7 +1068,7 @@ export interface PlanarProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "PlanarProjection";
+  type: 'PlanarProjection';
   fov: CameraFieldOfView;
   distance?: Distance;
   orientation?: Orientation2;
@@ -1099,7 +1099,7 @@ export interface ProjectionPlane {
   /**
    * Defines the type of this projection.
    */
-  type: "ProjectionPlane";
+  type: 'ProjectionPlane';
   lowerleft: LowerLeftCorner;
   upperleft: UpperLeftCorner;
   upperright: UpperRightCorner;
@@ -1135,7 +1135,7 @@ export interface SphericalMirrorProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "SphericalMirrorProjection";
+  type: 'SphericalMirrorProjection';
   quality?: Quality4;
   tilt?: Tilt1;
   background?: Background1;
@@ -1167,7 +1167,7 @@ export interface TextureMappedProjection {
   /**
    * Defines the type of this projection.
    */
-  type: "TextureMappedProjection";
+  type: 'TextureMappedProjection';
   fov: CameraFieldOfView1;
   distance?: Distance1;
   orientation?: Orientation3;
