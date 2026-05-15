@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Anchor, FileInput, Stack, Text } from '@mantine/core';
+import { Alert, Anchor, Button, FileInput, Group, Stack, Text } from '@mantine/core';
 
 import { readFile } from '../util/helper';
 
@@ -11,9 +11,11 @@ interface Props {
 }
 
 export function FileConverter({ convert, accept }: Props) {
+  const [inputFile, setInputFile] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string>();
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!file) {
@@ -25,37 +27,48 @@ export function FileConverter({ convert, accept }: Props) {
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  const handleFileChange = useCallback(
-    async (inputFile: File | null) => {
-      setFile(null);
-      setError(undefined);
+  const handleFileChange = useCallback((selected: File | null) => {
+    setInputFile(selected);
+    setFile(null);
+    setError(undefined);
+  }, []);
 
-      if (!inputFile) {
-        return;
-      }
-      try {
-        const content = await readFile(inputFile);
-        const baseName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'));
-        const convertedContent = await convert(content, inputFile.name);
-        const convertedFile = new File([convertedContent], `${baseName}.json`, {
-          type: 'application/json'
-        });
-        setFile(convertedFile);
-      } catch (err) {
-        console.error(err);
-        setError(err instanceof Error ? err.message : String(err));
-      }
-    },
-    [convert]
-  );
+  const handleApply = useCallback(async () => {
+    if (!inputFile) {
+      return;
+    }
+    setLoading(true);
+    setFile(null);
+    setError(undefined);
+    try {
+      const content = await readFile(inputFile);
+      const baseName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'));
+      const convertedContent = await convert(content, inputFile.name);
+      const convertedFile = new File([convertedContent], `${baseName}.json`, {
+        type: 'application/json'
+      });
+      setFile(convertedFile);
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLoading(false);
+    }
+  }, [convert, inputFile]);
 
   return (
     <Stack mt={'sm'}>
-      <FileInput
-        onChange={handleFileChange}
-        accept={accept}
-        placeholder={'Select file...'}
-      />
+      <Group align={'flex-end'}>
+        <FileInput
+          flex={1}
+          onChange={handleFileChange}
+          accept={accept}
+          placeholder={'Select file...'}
+        />
+        <Button onClick={handleApply} disabled={!inputFile} loading={loading}>
+          Apply
+        </Button>
+      </Group>
       {objectUrl && file && (
         <Anchor download={file.name} href={objectUrl}>
           Download: {file.name}
