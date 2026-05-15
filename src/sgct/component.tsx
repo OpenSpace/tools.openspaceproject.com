@@ -1,5 +1,5 @@
-import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import { Link } from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+import { Alert, Anchor, FileInput, Stack, Text } from '@mantine/core';
 
 import { convertFileMPCDI, convertFileVersion } from './converters';
 import { readFile } from './helper';
@@ -32,16 +32,10 @@ function FileConverter({ convert, accept }: FileConverterProps) {
   }, [file]);
 
   const handleFileChange = useCallback(
-    async (e: ChangeEvent<HTMLInputElement>) => {
+    async (inputFile: File | null) => {
       setFile(null);
       setError(undefined);
 
-      const { files } = e.target;
-      if (!files || files.length === 0) {
-        return;
-      }
-
-      const [inputFile] = files;
       if (!inputFile) {
         return;
       }
@@ -62,32 +56,34 @@ function FileConverter({ convert, accept }: FileConverterProps) {
   );
 
   return (
-    <div>
-      <input type={'file'} onChange={handleFileChange} accept={accept} />
-      <div>
-        {objectUrl && file && (
-          <a download={file.name} href={objectUrl}>
-            Download: {file.name}
-          </a>
-        )}
-      </div>
-      {error && (
-        <div>
-          Fatal error while converting: <br /> {error}
-        </div>
+    <Stack mt={'sm'}>
+      <FileInput
+        onChange={handleFileChange}
+        accept={accept}
+        placeholder={'Select file...'}
+      />
+      {objectUrl && file && (
+        <Anchor download={file.name} href={objectUrl}>
+          Download: {file.name}
+        </Anchor>
       )}
-      <div className={'note'}>
+      {error && (
+        <Alert color={'red'} title={'Fatal error while converting'}>
+          {error}
+        </Alert>
+      )}
+      <Text size={'sm'} c={'dimmed'}>
         If the converted file does not load, please let us know by creating an issue on{' '}
-        <Link
+        <Anchor
           href={
             'https://github.com/OpenSpace/OpenSpace/issues/new?labels=Type%3A+Bug&title=SGCT%20Config%20Converter%20Error'
           }
         >
           GitHub
-        </Link>{' '}
-        or via <Link href={'mailto:support@openspaceproject.com'}>mail</Link>
-      </div>
-    </div>
+        </Anchor>{' '}
+        or via <Anchor href={'mailto:support@openspaceproject.com'}>mail</Anchor>
+      </Text>
+    </Stack>
   );
 }
 
