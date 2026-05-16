@@ -18,18 +18,15 @@ export function FileConverter({ convert, accept }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!file) {
-      setObjectUrl(null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setObjectUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [objectUrl]);
 
   const handleFileChange = useCallback((selected: File | null) => {
     setInputFile(selected);
     setFile(null);
+    setObjectUrl(null);
     setError(undefined);
   }, []);
 
@@ -39,6 +36,7 @@ export function FileConverter({ convert, accept }: Props) {
     }
     setLoading(true);
     setFile(null);
+    setObjectUrl(null);
     setError(undefined);
     try {
       const content = await readFile(inputFile);
@@ -48,6 +46,7 @@ export function FileConverter({ convert, accept }: Props) {
         type: 'application/json'
       });
       setFile(convertedFile);
+      setObjectUrl(URL.createObjectURL(convertedFile));
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : String(err));

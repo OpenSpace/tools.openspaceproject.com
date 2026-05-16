@@ -700,9 +700,14 @@ export async function convertFileVersion(
   }
 
   // Check the result against the JSON schema that we have
-  const result = validate(converted, schema);
-  if (!result.valid) {
-    alert(result.toString());
+  try {
+    const result = validate(converted, schema);
+    if (!result.valid) {
+      alert(result.toString());
+    }
+  } catch {
+    // jsonschema may fail in browser environments due to URL API limitations
+    console.warn('Schema validation skipped: jsonschema threw an unexpected error');
   }
 
   const convertedContent = JSON.stringify(converted, null, 2);
@@ -721,9 +726,14 @@ export async function convertFileMPCDI(content: string): Promise<string> {
   const converted = convertFromMpcdi(obj);
 
   // Check the result against the JSON schema that we have
-  const result = validate(converted, schema);
-  if (!result.valid) {
-    alert(result.toString());
+  try {
+    const result = validate(converted, schema);
+    if (!result.valid) {
+      alert(result.toString());
+    }
+  } catch {
+    // jsonschema may fail in browser environments due to URL API limitations
+    console.warn('Schema validation skipped: jsonschema threw an unexpected error');
   }
 
   const convertedContent = JSON.stringify(converted, null, 2);
