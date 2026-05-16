@@ -11,8 +11,8 @@ export function CosmConverter() {
         COSM configuration file converter
       </Title>
       <Text mb={'xs'}>
-        This converter takes a COSM MPCDI configuration file and converts it into a
-        format that can be loaded by SGCT.
+        This converter takes a COSM MPCDI configuration file and converts it into a format
+        that can be loaded by SGCT.
       </Text>
       <FileConverter convert={convertFileMPCDI} accept={'.xml'} />
     </Card>

@@ -1,7 +1,6 @@
+import { diffString } from 'json-diff';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, join } from 'node:path';
-
-import { diffString } from 'json-diff';
 
 import { convertFileVersion } from '../src/sgct/converters';
 
