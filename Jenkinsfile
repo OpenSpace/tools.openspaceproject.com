@@ -28,7 +28,7 @@ node("server-ui") {
       );
 
       sh(
-        script: "mv out/* ${target}",
+        script: "mv dist/* ${target}",
         label: "Deploy files"
       );
     }
