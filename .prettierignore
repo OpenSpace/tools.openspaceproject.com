@@ -1,2 +1,2 @@
-src/sgct/util/sgct.d.ts
-src/sgct/util/sgct.schema.json
+src/util/sgct/sgct.d.ts
+src/util/sgct/sgct.schema.json
