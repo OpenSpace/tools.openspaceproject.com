@@ -67,11 +67,8 @@ function convertVersion(obj: any): SGCTConfig {
 
       rename(obj.scene, 'Scale', 'scale');
       if ('scale' in obj.scene) {
-        obj.scene.scale = obj.scene.scale[0].value;
-        toNumber(obj.scene, 'value');
+        obj.scene.scale = Number(obj.scene.scale[0].value);
       }
-      rename(obj.scene, 'Scale', 'scale');
-      toNumber(obj.scene, 'scale');
     }
 
     rename(obj, 'User', 'users');
@@ -295,8 +292,7 @@ function convertVersion(obj: any): SGCTConfig {
         // that value down
         rename(window, 'Stereo', 'stereo');
         if ('stereo' in window) {
-          window.stereo = window.stereo[0].type;
-          toString(window, 'stereo');
+          window.stereo = String(window.stereo[0].type);
         }
 
         rename(window, 'Pos', 'pos');

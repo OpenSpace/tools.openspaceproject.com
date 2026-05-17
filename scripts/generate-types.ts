@@ -45,7 +45,7 @@ function parseDeclarations(ts: string): Decl[] {
 
     // Skip JSDoc / block comments, keeping lineStart at the comment's first line
     if (line.trimStart().startsWith('/*')) {
-      while (i < lines.length && !line.includes('*/')) i++;
+      while (i < lines.length && !lines[i]!.includes('*/')) i++;
       if (i < lines.length) i++;
       if (i >= lines.length) break;
     }
@@ -61,7 +61,7 @@ function parseDeclarations(ts: string): Decl[] {
       let def = initialDef;
       while (!isTypeDefComplete(def)) {
         i++;
-        def += '\n' + (line ?? '');
+        def += '\n' + (lines[i] ?? '');
       }
       decls.push({
         name,
@@ -85,7 +85,7 @@ function parseDeclarations(ts: string): Decl[] {
       }
       while (depth > 0 && i < lines.length - 1) {
         i++;
-        for (const ch of line) {
+        for (const ch of lines[i]!) {
           if (ch === '{') depth++;
           else if (ch === '}') depth--;
         }

@@ -9,8 +9,8 @@
     "prebuild": "npm run generate",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "npx prettier . --check & eslint .",
-    "lint-fix": "npx prettier . --write & eslint . --fix",
+    "lint": "npx prettier . --check && eslint .",
+    "lint-fix": "npx prettier . --write && eslint . --fix",
     "test": "tsx tests/test.ts"
   },
   "dependencies": {
