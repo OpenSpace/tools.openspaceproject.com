@@ -16,12 +16,18 @@ export function useOpenSpace(): UseOpenSpaceResult {
   const [status, setStatus] = useState<ConnectionStatus>('disconnected');
   const [library, setLibrary] = useState<OpenSpaceLibrary | null>(null);
   const apiRef = useRef<ReturnType<typeof createApi> | null>(null);
+  const statusRef = useRef<ConnectionStatus>('disconnected');
+
+  function updateStatus(next: ConnectionStatus) {
+    statusRef.current = next;
+    setStatus(next);
+  }
 
   const disconnect = useCallback(() => {
     apiRef.current?.disconnect();
     apiRef.current = null;
     setLibrary(null);
-    setStatus('disconnected');
+    updateStatus('disconnected');
   }, []);
 
   const getProperty = useCallback(async (uri: string): Promise<unknown> => {
@@ -33,7 +39,7 @@ export function useOpenSpace(): UseOpenSpaceResult {
     (host = 'localhost', port = 4682) => {
       if (apiRef.current) disconnect();
 
-      setStatus('connecting');
+      updateStatus('connecting');
       const api = createApi(host, port);
       apiRef.current = api;
 
@@ -41,21 +47,23 @@ export function useOpenSpace(): UseOpenSpaceResult {
         try {
           const lib = await api.library<OpenSpaceLibrary>();
           setLibrary(lib);
-          setStatus('connected');
+          updateStatus('connected');
         } catch {
-          setStatus('error');
+          updateStatus('error');
         }
       });
 
       api.onDisconnect(() => {
         setLibrary(null);
-        setStatus('disconnected');
+        // If we were still connecting or already connected, the socket closed
+        // unexpectedly — surface it as an error rather than a clean disconnect.
+        updateStatus(statusRef.current === 'disconnected' ? 'disconnected' : 'error');
       });
 
       try {
         api.connect();
       } catch {
-        setStatus('error');
+        updateStatus('error');
       }
     },
     [disconnect]

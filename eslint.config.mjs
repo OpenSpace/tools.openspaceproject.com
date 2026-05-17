@@ -66,7 +66,7 @@ export default tseslint.config(
       ],
       'no-self-compare': 'error',
       'no-unreachable-loop': 'error',
-      'no-template-curly-in-string': 'off',
+      'no-template-curly-in-string': 'error',
       'default-case': ['error', { commentPattern: '^skip\\sdefault' }],
       'default-case-last': 'error'
     }

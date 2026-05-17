@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  Alert,
   Button,
   Checkbox,
   Group,
@@ -13,7 +14,7 @@ import {
 } from '@mantine/core';
 import type { OpenSpaceLibrary } from 'openspace-api-js/types';
 
-import type { NavigationStateValue, TestCommand } from '../util/testwizard/types';
+import type { NavigationStateValue, TestCommand, Vec3 } from '../util/testwizard/types';
 
 const COMMAND_OPTIONS = [
   { value: 'navigationstate', label: 'Navigation State' },
@@ -48,8 +49,6 @@ function parseVec3(s: string): Vec3 | null {
   if (x === undefined || y === undefined || z === undefined) return null;
   return [x, y, z];
 }
-
-type Vec3 = [number, number, number];
 
 interface OsNavState {
   Anchor: string;
@@ -102,6 +101,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
 
   // live-fetch state
   const [fetching, setFetching] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [assetOptions, setAssetOptions] = useState<string[]>([]);
   const [actionOptions, setActionOptions] = useState<{ value: string; label: string }[]>(
     []
@@ -110,6 +110,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchNavState() {
     if (!library) return;
     setFetching(true);
+    setFetchError(null);
     try {
       const navstate = (await library.navigation.getNavigationState()) as OsNavState;
       setNavAnchor(navstate.Anchor);
@@ -123,6 +124,8 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
         setNavTimestamp(navstate.Timestamp);
         setNavIncludeTimestamp(true);
       }
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch navigation state');
     } finally {
       setFetching(false);
     }
@@ -131,8 +134,11 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchTime() {
     if (!library) return;
     setFetching(true);
+    setFetchError(null);
     try {
       setStrValue(await library.time.UTC());
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch time');
     } finally {
       setFetching(false);
     }
@@ -141,8 +147,11 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchDeltaTime() {
     if (!library) return;
     setFetching(true);
+    setFetchError(null);
     try {
       setNumValue(await library.time.deltaTime());
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch delta time');
     } finally {
       setFetching(false);
     }
@@ -151,6 +160,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchPropertyValue() {
     if (!propUri) return;
     setFetching(true);
+    setFetchError(null);
     try {
       const result = (await getProperty(propUri)) as {
         type: string;
@@ -159,6 +169,8 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       if (result.type === 'property') {
         setPropRawValue(String(result.value.value));
       }
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch property value');
     } finally {
       setFetching(false);
     }
@@ -167,7 +179,9 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchAssets() {
     if (!library) return;
     setFetching(true);
+    setFetchError(null);
     try {
+      // eslint-disable-next-line no-template-curly-in-string
       const folder = await library.absPath('${ASSETS}');
       const rawAssets = await library.asset.rootAssets();
       const all = Object.values(rawAssets as Record<number, string>);
@@ -184,6 +198,8 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       setAssetOptions(names);
       const [first] = names;
       if (first) setStrValue(first);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch assets');
     } finally {
       setFetching(false);
     }
@@ -192,6 +208,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   async function fetchActions() {
     if (!library) return;
     setFetching(true);
+    setFetchError(null);
     try {
       const rawActions = await library.action.actions();
       const actions = Object.values(rawActions as Record<number, OsAction>);
@@ -202,6 +219,8 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       setActionOptions(opts);
       const [first] = opts;
       if (first) setStrValue(first.value);
+    } catch (e) {
+      setFetchError(e instanceof Error ? e.message : 'Failed to fetch actions');
     } finally {
       setFetching(false);
     }
@@ -275,6 +294,11 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
 
   return (
     <Stack gap={'sm'}>
+      {fetchError !== null && (
+        <Alert color={'red'} variant={'light'} withCloseButton onClose={() => setFetchError(null)}>
+          {fetchError}
+        </Alert>
+      )}
       <Select
         label={'Command type'}
         data={COMMAND_OPTIONS}

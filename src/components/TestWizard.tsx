@@ -14,6 +14,11 @@ import {
 import type { OsTest, TestCommand } from '../util/testwizard/types';
 import { useOpenSpace } from '../util/testwizard/useOpenSpace';
 
+interface CommandEntry {
+  id: string;
+  cmd: TestCommand;
+}
+
 import { AddCommandForm } from './AddCommandForm';
 import { CollapsibleCard } from './CollapsibleCard';
 
@@ -61,7 +66,7 @@ export function TestWizard() {
   const [port, setPort] = useState<number | string>(4682);
   const [profile, setProfile] = useState('');
   const [name, setName] = useState('');
-  const [commands, setCommands] = useState<TestCommand[]>([]);
+  const [commands, setCommands] = useState<CommandEntry[]>([]);
 
   async function fetchProfile() {
     if (!library) return;
@@ -73,7 +78,7 @@ export function TestWizard() {
   }
 
   function handleAdd(cmd: TestCommand) {
-    setCommands((prev) => [...prev, cmd]);
+    setCommands((prev) => [...prev, { id: crypto.randomUUID(), cmd }]);
   }
 
   function handleRemove(index: number) {
@@ -110,14 +115,12 @@ export function TestWizard() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const parsed = JSON.parse(ev.target?.result as string) as unknown;
-        if (!parsed || typeof parsed !== 'object' || !Array.isArray((parsed as { commands?: unknown }).commands)) {
-          return;
-        }
-
-        const test = parsed as { profile?: unknown; commands: TestCommand[] };
-        const nextProfile = typeof test.profile === 'string' ? test.profile : '';
-        const cmds = test.commands.filter((c) => c.type !== 'screenshot');
+        const test = JSON.parse(ev.target?.result as string) as OsTest;
+        setProfile(test.profile ?? '');
+        const cmds = test.commands
+          .filter((c) => c.type !== 'screenshot')
+          .map((c) => ({ id: crypto.randomUUID(), cmd: c }));
+        setCommands(cmds);
         const fileName = file.name.replace(/\.ostest$/i, '');
 
         setProfile(nextProfile);
@@ -138,7 +141,7 @@ export function TestWizard() {
   function handleDownload() {
     const test: OsTest = {
       profile,
-      commands: [...commands, { type: 'screenshot' }]
+      commands: [...commands.map((e) => e.cmd), { type: 'screenshot' }],
     };
     downloadTest(test, name);
   }
@@ -251,10 +254,10 @@ export function TestWizard() {
               No commands added yet. A screenshot command will be appended automatically.
             </Text>
           )}
-          {commands.map((cmd, i) => (
-            <Paper key={i} withBorder p={'xs'}>
+          {commands.map((entry, i) => (
+            <Paper key={entry.id} withBorder p={'xs'}>
               <Group justify={'space-between'}>
-                <Text size={'sm'}>{commandLabel(cmd)}</Text>
+                <Text size={'sm'}>{commandLabel(entry.cmd)}</Text>
                 <Group gap={'xs'}>
                   <Button
                     size={'xs'}
