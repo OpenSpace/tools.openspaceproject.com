@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Alert, Badge, Button, Divider, Group, NumberInput, Paper, Stack, Text, TextInput } from '@mantine/core';
 
 import type { OsTest, TestCommand } from '../util/testwizard/types';
@@ -88,6 +88,28 @@ export function TestWizard() {
       next.splice(index + 1, 0, item);
       return next;
     });
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleLoadFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const test = JSON.parse(ev.target?.result as string) as OsTest;
+        setProfile(test.profile ?? '');
+        const cmds = test.commands.filter((c) => c.type !== 'screenshot');
+        setCommands(cmds);
+        const fileName = file.name.replace(/\.ostest$/i, '');
+        setName(fileName);
+      } catch {
+        // ignore malformed files
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
   }
 
   function handleDownload() {
@@ -237,9 +259,21 @@ export function TestWizard() {
 
       <AddCommandForm library={library} getProperty={getProperty} onAdd={handleAdd} />
 
-      <Button onClick={handleDownload} disabled={!profile || !name} fullWidth>
-        Download .ostest
-      </Button>
+      <input
+        ref={fileInputRef}
+        type={'file'}
+        accept={'.ostest'}
+        style={{ display: 'none' }}
+        onChange={handleLoadFile}
+      />
+      <Group grow>
+        <Button onClick={handleDownload} disabled={!profile || !name}>
+          Download .ostest
+        </Button>
+        <Button variant={'light'} onClick={() => fileInputRef.current?.click()}>
+          Load .ostest
+        </Button>
+      </Group>
     </CollapsibleCard>
   );
 }
