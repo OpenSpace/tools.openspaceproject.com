@@ -3,7 +3,6 @@ import {
   Alert,
   Badge,
   Button,
-  Divider,
   Group,
   NumberInput,
   Paper,
@@ -135,145 +134,162 @@ export function TestWizard() {
 
   return (
     <CollapsibleCard title={'Test Wizard'}>
-      <Text mb={'xs'}>
+      <Text mb={'md'}>
         Create OpenSpace visual regression test files by selecting a sequence of commands.
         The resulting <code>.ostest</code> file can be run by the OpenSpace test framework
         to verify that the application renders correctly.
       </Text>
 
-      {/* ── Connection panel ── */}
-      <Stack gap={'xs'} mb={'md'}>
-        <Group gap={'xs'}>
-          <TextInput
-            label={'Host'}
-            value={host}
-            onChange={(e) => setHost(e.currentTarget.value)}
-            style={{ flex: 1 }}
-          />
-          <NumberInput
-            label={'Port'}
-            value={port}
-            onChange={setPort}
-            min={1}
-            max={65535}
-            style={{ width: 100 }}
-          />
-          {status === 'disconnected' || status === 'error' ? (
-            <Button
-              mt={'md'}
-              onClick={() =>
-                connect(host, typeof port === 'number' ? port : Number(port))
+      {/* ── Connection ── */}
+      <Paper withBorder p={'sm'} mb={'sm'}>
+        <Text fw={500} size={'sm'} mb={'xs'}>
+          Connection
+        </Text>
+        <Stack gap={'xs'}>
+          <Group gap={'xs'} align={'flex-end'}>
+            <TextInput
+              label={'Host'}
+              value={host}
+              onChange={(e) => setHost(e.currentTarget.value)}
+              style={{ flex: 1 }}
+            />
+            <NumberInput
+              label={'Port'}
+              value={port}
+              onChange={setPort}
+              min={1}
+              max={65535}
+              style={{ width: 100 }}
+            />
+            {status === 'disconnected' || status === 'error' ? (
+              <Button
+                onClick={() =>
+                  connect(host, typeof port === 'number' ? port : Number(port))
+                }
+              >
+                Connect
+              </Button>
+            ) : (
+              <Button variant={'light'} color={'red'} onClick={disconnect}>
+                Disconnect
+              </Button>
+            )}
+            <Badge
+              color={
+                status === 'connected'
+                  ? 'green'
+                  : status === 'connecting'
+                    ? 'yellow'
+                    : status === 'error'
+                      ? 'red'
+                      : 'gray'
               }
             >
-              Connect
-            </Button>
-          ) : (
-            <Button mt={'md'} variant={'light'} color={'red'} onClick={disconnect}>
-              Disconnect
-            </Button>
+              {status}
+            </Badge>
+          </Group>
+          {status === 'error' && (
+            <Alert color={'red'} variant={'light'}>
+              Could not connect to OpenSpace. Make sure OpenSpace is running and the server
+              module is enabled.
+            </Alert>
           )}
-          <Badge
-            mt={'md'}
-            color={
-              status === 'connected'
-                ? 'green'
-                : status === 'connecting'
-                  ? 'yellow'
-                  : status === 'error'
-                    ? 'red'
-                    : 'gray'
-            }
-          >
-            {status}
-          </Badge>
-        </Group>
-        {status === 'error' && (
-          <Alert color={'red'} variant={'light'}>
-            Could not connect to OpenSpace. Make sure OpenSpace is running and the server
-            module is enabled.
-          </Alert>
-        )}
-      </Stack>
+        </Stack>
+      </Paper>
 
-      <Group grow>
-        <Group align={'flex-end'} gap={'xs'}>
+      {/* ── Header ── */}
+      <Paper withBorder p={'sm'} mb={'sm'}>
+        <Text fw={500} size={'sm'} mb={'xs'}>
+          Header
+        </Text>
+        <Stack gap={'xs'}>
           <TextInput
-            style={{ flex: 1 }}
-            label={'Profile'}
-            placeholder={'default'}
-            value={profile}
-            onChange={(e) => setProfile(e.currentTarget.value)}
+            label={'Test name'}
+            placeholder={'my_test'}
+            value={name}
+            onChange={(e) => setName(e.currentTarget.value)}
           />
-          <Button
-            size={'sm'}
-            variant={'light'}
-            disabled={!library}
-            onClick={() => void fetchProfile()}
-            mb={'xs'}
-          >
-            Fetch
-          </Button>
-        </Group>
-        <TextInput
-          label={'Test name'}
-          placeholder={'my_test'}
-          value={name}
-          onChange={(e) => setName(e.currentTarget.value)}
-        />
-      </Group>
+          <Group align={'flex-end'} gap={'xs'}>
+            <TextInput
+              style={{ flex: 1 }}
+              label={'Profile'}
+              placeholder={'default'}
+              value={profile}
+              onChange={(e) => setProfile(e.currentTarget.value)}
+            />
+            <Button
+              size={'sm'}
+              variant={'light'}
+              disabled={!library}
+              onClick={() => void fetchProfile()}
+            >
+              Fetch
+            </Button>
+          </Group>
+        </Stack>
+      </Paper>
 
-      <Divider label={'Commands'} labelPosition={'left'} />
-
-      <Stack gap={'xs'}>
-        {commands.length === 0 && (
-          <Text c={'dimmed'} size={'sm'}>
-            No commands added yet. A screenshot command will be appended automatically.
-          </Text>
-        )}
-        {commands.map((cmd, i) => (
-          <Paper key={i} withBorder p={'xs'}>
-            <Group justify={'space-between'}>
-              <Text size={'sm'}>{commandLabel(cmd)}</Text>
-              <Group gap={'xs'}>
-                <Button
-                  size={'xs'}
-                  variant={'subtle'}
-                  onClick={() => handleMoveUp(i)}
-                  disabled={i === 0}
-                >
-                  ↑
-                </Button>
-                <Button
-                  size={'xs'}
-                  variant={'subtle'}
-                  onClick={() => handleMoveDown(i)}
-                  disabled={i === commands.length - 1}
-                >
-                  ↓
-                </Button>
-                <Button
-                  size={'xs'}
-                  variant={'subtle'}
-                  color={'red'}
-                  onClick={() => handleRemove(i)}
-                >
-                  ×
-                </Button>
+      {/* ── Commands ── */}
+      <Paper withBorder p={'sm'} mb={'sm'}>
+        <Text fw={500} size={'sm'} mb={'xs'}>
+          Commands
+        </Text>
+        <Stack gap={'xs'}>
+          {commands.length === 0 && (
+            <Text c={'dimmed'} size={'sm'}>
+              No commands added yet. A screenshot command will be appended automatically.
+            </Text>
+          )}
+          {commands.map((cmd, i) => (
+            <Paper key={i} withBorder p={'xs'}>
+              <Group justify={'space-between'}>
+                <Text size={'sm'}>{commandLabel(cmd)}</Text>
+                <Group gap={'xs'}>
+                  <Button
+                    size={'xs'}
+                    variant={'subtle'}
+                    onClick={() => handleMoveUp(i)}
+                    disabled={i === 0}
+                  >
+                    ↑
+                  </Button>
+                  <Button
+                    size={'xs'}
+                    variant={'subtle'}
+                    onClick={() => handleMoveDown(i)}
+                    disabled={i === commands.length - 1}
+                  >
+                    ↓
+                  </Button>
+                  <Button
+                    size={'xs'}
+                    variant={'subtle'}
+                    color={'red'}
+                    onClick={() => handleRemove(i)}
+                  >
+                    ×
+                  </Button>
+                </Group>
               </Group>
-            </Group>
+            </Paper>
+          ))}
+          <Paper withBorder p={'xs'}>
+            <Text size={'sm'} c={'dimmed'} fs={'italic'}>
+              Screenshot (added automatically)
+            </Text>
           </Paper>
-        ))}
-        <Paper withBorder p={'xs'}>
-          <Text size={'sm'} c={'dimmed'} fs={'italic'}>
-            Screenshot (added automatically)
-          </Text>
-        </Paper>
-      </Stack>
+        </Stack>
+      </Paper>
 
-      <Divider label={'Add command'} labelPosition={'left'} />
+      {/* ── Current command ── */}
+      <Paper withBorder p={'sm'} mb={'sm'}>
+        <Text fw={500} size={'sm'} mb={'xs'}>
+          Current command
+        </Text>
+        <AddCommandForm library={library} getProperty={getProperty} onAdd={handleAdd} />
+      </Paper>
 
-      <AddCommandForm library={library} getProperty={getProperty} onAdd={handleAdd} />
-
+      {/* ── Footer ── */}
       <input
         ref={fileInputRef}
         type={'file'}
@@ -282,15 +298,15 @@ export function TestWizard() {
         onChange={handleLoadFile}
       />
       <Group grow>
-        <Button color={'teal'} onClick={handleDownload} disabled={!profile || !name}>
-          Download .ostest
-        </Button>
         <Button
           color={'violet'}
           variant={'light'}
           onClick={() => fileInputRef.current?.click()}
         >
           Load .ostest
+        </Button>
+        <Button color={'teal'} onClick={handleDownload} disabled={!profile || !name}>
+          Download .ostest
         </Button>
       </Group>
     </CollapsibleCard>
