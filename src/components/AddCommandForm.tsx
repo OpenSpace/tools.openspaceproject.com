@@ -296,7 +296,12 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   return (
     <Stack gap={'sm'}>
       {fetchError !== null && (
-        <Alert color={'red'} variant={'light'} withCloseButton onClose={() => setFetchError(null)}>
+        <Alert
+          color={'red'}
+          variant={'light'}
+          withCloseButton
+          onClose={() => setFetchError(null)}
+        >
           {fetchError}
         </Alert>
       )}

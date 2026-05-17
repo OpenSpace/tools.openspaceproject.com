@@ -128,7 +128,9 @@ export function TestWizard() {
         setName(fileName);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        window.alert(`Failed to load test file "${file.name}". Please choose a valid .ostest file.\n\n${message}`);
+        window.alert(
+          `Failed to load test file "${file.name}". Please choose a valid .ostest file.\n\n${message}`
+        );
       }
     };
     reader.onerror = () => {
@@ -141,7 +143,7 @@ export function TestWizard() {
   function handleDownload() {
     const test: OsTest = {
       profile,
-      commands: [...commands.map((e) => e.cmd), { type: 'screenshot' }],
+      commands: [...commands.map((e) => e.cmd), { type: 'screenshot' }]
     };
     downloadTest(test, name);
   }
@@ -204,8 +206,8 @@ export function TestWizard() {
           </Group>
           {status === 'error' && (
             <Alert color={'red'} variant={'light'}>
-              Could not connect to OpenSpace. Make sure OpenSpace is running and the server
-              module is enabled.
+              Could not connect to OpenSpace. Make sure OpenSpace is running and the
+              server module is enabled.
             </Alert>
           )}
         </Stack>
