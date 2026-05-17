@@ -167,10 +167,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       .map((a) => {
         const relative = a.startsWith(folder) ? a.slice(folder.length + 1) : a;
         const dotIdx = relative.indexOf('.');
-        return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(
-          /\\/g,
-          '/'
-        );
+        return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(/\\/g, '/');
       })
       .sort();
     setAssetOptions(names);

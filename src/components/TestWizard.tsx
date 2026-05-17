@@ -116,14 +116,11 @@ export function TestWizard() {
     reader.onload = (ev) => {
       try {
         const test = JSON.parse(ev.target?.result as string) as OsTest;
-        setProfile(test.profile ?? '');
         const cmds = test.commands
           .filter((c) => c.type !== 'screenshot')
           .map((c) => ({ id: crypto.randomUUID(), cmd: c }));
-        setCommands(cmds);
         const fileName = file.name.replace(/\.ostest$/i, '');
-
-        setProfile(nextProfile);
+        setProfile(test.profile ?? '');
         setCommands(cmds);
         setName(fileName);
       } catch (error) {
