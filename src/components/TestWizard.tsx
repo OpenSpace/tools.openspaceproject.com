@@ -1,5 +1,16 @@
 import { useRef, useState } from 'react';
-import { Alert, Badge, Button, Divider, Group, NumberInput, Paper, Stack, Text, TextInput } from '@mantine/core';
+import {
+  Alert,
+  Badge,
+  Button,
+  Divider,
+  Group,
+  NumberInput,
+  Paper,
+  Stack,
+  Text,
+  TextInput
+} from '@mantine/core';
 
 import type { OsTest, TestCommand } from '../util/testwizard/types';
 import { useOpenSpace } from '../util/testwizard/useOpenSpace';
@@ -29,6 +40,8 @@ function commandLabel(cmd: TestCommand): string {
       return `Property: ${cmd.value.property} = ${String(cmd.value.value)}`;
     case 'navigationstate':
       return `Navigation state (anchor: ${cmd.value.anchor})`;
+    default:
+      throw new Error(`Unhandled command type: ${cmd}`);
   }
 }
 
@@ -115,7 +128,7 @@ export function TestWizard() {
   function handleDownload() {
     const test: OsTest = {
       profile,
-      commands: [...commands, { type: 'screenshot' }],
+      commands: [...commands, { type: 'screenshot' }]
     };
     downloadTest(test, name);
   }
@@ -148,7 +161,9 @@ export function TestWizard() {
           {status === 'disconnected' || status === 'error' ? (
             <Button
               mt={'md'}
-              onClick={() => connect(host, typeof port === 'number' ? port : Number(port))}
+              onClick={() =>
+                connect(host, typeof port === 'number' ? port : Number(port))
+              }
             >
               Connect
             </Button>
@@ -270,7 +285,11 @@ export function TestWizard() {
         <Button color={'teal'} onClick={handleDownload} disabled={!profile || !name}>
           Download .ostest
         </Button>
-        <Button color={'violet'} variant={'light'} onClick={() => fileInputRef.current?.click()}>
+        <Button
+          color={'violet'}
+          variant={'light'}
+          onClick={() => fileInputRef.current?.click()}
+        >
           Load .ostest
         </Button>
       </Group>

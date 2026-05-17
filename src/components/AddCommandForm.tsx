@@ -9,7 +9,7 @@ import {
   Switch,
   Text,
   Textarea,
-  TextInput,
+  TextInput
 } from '@mantine/core';
 import type { OpenSpaceLibrary } from 'openspace-api-js/types';
 
@@ -24,20 +24,21 @@ const COMMAND_OPTIONS = [
   { value: 'time', label: 'Time' },
   { value: 'pause', label: 'Pause' },
   { value: 'deltatime', label: 'Delta Time' },
-  { value: 'action', label: 'Action' },
+  { value: 'action', label: 'Action' }
 ];
 
 const COMMAND_DESCRIPTIONS: Record<string, string> = {
   navigationstate:
     'Stores the current camera position (and optionally the time). Restores it when the test is run.',
   asset: 'Causes the test to load a specific asset file.',
-  property: 'Stores a property value. When run, the property will be set to the stored value.',
+  property:
+    'Stores a property value. When run, the property will be set to the stored value.',
   wait: 'Causes the test to wait for a specified number of seconds before proceeding.',
   script: 'A Lua script that will be executed during the regression test.',
   time: 'Stores the in-game time and restores it when the test is run.',
   pause: 'Pauses or resumes simulation time.',
   deltatime: 'Sets the simulation delta time when the test is run.',
-  action: 'Triggers a registered action.',
+  action: 'Triggers a registered action.'
 };
 
 function parseVec3(s: string): Vec3 | null {
@@ -102,7 +103,9 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   // live-fetch state
   const [fetching, setFetching] = useState(false);
   const [assetOptions, setAssetOptions] = useState<string[]>([]);
-  const [actionOptions, setActionOptions] = useState<{ value: string; label: string }[]>([]);
+  const [actionOptions, setActionOptions] = useState<{ value: string; label: string }[]>(
+    []
+  );
 
   async function fetchNavState() {
     if (!library) return;
@@ -172,7 +175,10 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
         .map((a) => {
           const relative = a.startsWith(folder) ? a.slice(folder.length + 1) : a;
           const dotIdx = relative.indexOf('.');
-          return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(/\\/g, '/');
+          return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(
+            /\\/g,
+            '/'
+          );
         })
         .sort();
       setAssetOptions(names);
@@ -191,7 +197,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       const actions = Object.values(rawActions as Record<number, OsAction>);
       const opts = actions.map((a) => ({
         value: a.Identifier,
-        label: `${a.Name} (${a.Identifier})`,
+        label: `${a.Name} (${a.Identifier})`
       }));
       setActionOptions(opts);
       const [first] = opts;

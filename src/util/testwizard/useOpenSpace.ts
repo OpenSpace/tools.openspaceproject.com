@@ -58,7 +58,7 @@ export function useOpenSpace(): UseOpenSpaceResult {
         setStatus('error');
       }
     },
-    [disconnect],
+    [disconnect]
   );
 
   return { status, library, getProperty, connect, disconnect };
