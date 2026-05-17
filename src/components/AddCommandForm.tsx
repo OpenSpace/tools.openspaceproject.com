@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   Button,
   Checkbox,
+  Group,
   NumberInput,
   Select,
   Stack,
@@ -10,6 +11,7 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core';
+import type { OpenSpaceLibrary } from 'openspace-api-js/types';
 
 import type { NavigationStateValue, TestCommand } from '../util/testwizard/types';
 
@@ -48,11 +50,29 @@ function parseVec3(s: string): Vec3 | null {
 
 type Vec3 = [number, number, number];
 
+interface OsNavState {
+  Anchor: string;
+  Position: Vec3;
+  Aim?: string;
+  Pitch?: number;
+  ReferenceFrame?: string;
+  Timestamp?: string;
+  Up?: Vec3;
+  Yaw?: number;
+}
+
+interface OsAction {
+  Identifier: string;
+  Name: string;
+}
+
 interface Props {
+  library: OpenSpaceLibrary | null;
+  getProperty: (uri: string) => Promise<unknown>;
   onAdd: (command: TestCommand) => void;
 }
 
-export function AddCommandForm({ onAdd }: Props) {
+export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   const [type, setType] = useState('wait');
 
   // wait / deltatime
@@ -78,6 +98,108 @@ export function AddCommandForm({ onAdd }: Props) {
   const [navYaw, setNavYaw] = useState<number | string>('');
   const [navTimestamp, setNavTimestamp] = useState('');
   const [navIncludeTimestamp, setNavIncludeTimestamp] = useState(false);
+
+  // live-fetch state
+  const [fetching, setFetching] = useState(false);
+  const [assetOptions, setAssetOptions] = useState<string[]>([]);
+  const [actionOptions, setActionOptions] = useState<{ value: string; label: string }[]>([]);
+
+  async function fetchNavState() {
+    if (!library) return;
+    setFetching(true);
+    try {
+      const navstate = (await library.navigation.getNavigationState()) as OsNavState;
+      setNavAnchor(navstate.Anchor);
+      setNavPosition(navstate.Position.join(', '));
+      if (navstate.Aim !== undefined) setNavAim(navstate.Aim);
+      if (navstate.Pitch !== undefined) setNavPitch(navstate.Pitch);
+      if (navstate.ReferenceFrame !== undefined) setNavRefFrame(navstate.ReferenceFrame);
+      if (navstate.Up !== undefined) setNavUp(navstate.Up.join(', '));
+      if (navstate.Yaw !== undefined) setNavYaw(navstate.Yaw);
+      if (navstate.Timestamp !== undefined) {
+        setNavTimestamp(navstate.Timestamp);
+        setNavIncludeTimestamp(true);
+      }
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function fetchTime() {
+    if (!library) return;
+    setFetching(true);
+    try {
+      setStrValue(await library.time.UTC());
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function fetchDeltaTime() {
+    if (!library) return;
+    setFetching(true);
+    try {
+      setNumValue(await library.time.deltaTime());
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function fetchPropertyValue() {
+    if (!propUri) return;
+    setFetching(true);
+    try {
+      const result = (await getProperty(propUri)) as {
+        type: string;
+        value: { value: unknown };
+      };
+      if (result.type === 'property') {
+        setPropRawValue(String(result.value.value));
+      }
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function fetchAssets() {
+    if (!library) return;
+    setFetching(true);
+    try {
+      const folder = await library.absPath('${ASSETS}');
+      const rawAssets = await library.asset.rootAssets();
+      const all = Object.values(rawAssets as Record<number, string>);
+      const names = all
+        .map((a) => {
+          const relative = a.startsWith(folder) ? a.slice(folder.length + 1) : a;
+          const dotIdx = relative.indexOf('.');
+          return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(/\\/g, '/');
+        })
+        .sort();
+      setAssetOptions(names);
+      const [first] = names;
+      if (first) setStrValue(first);
+    } finally {
+      setFetching(false);
+    }
+  }
+
+  async function fetchActions() {
+    if (!library) return;
+    setFetching(true);
+    try {
+      const rawActions = await library.action.actions();
+      const actions = Object.values(rawActions as Record<number, OsAction>);
+      const opts = actions.map((a) => ({
+        value: a.Identifier,
+        label: `${a.Name} (${a.Identifier})`,
+      }));
+      setActionOptions(opts);
+      const [first] = opts;
+      if (first) setStrValue(first.value);
+    } finally {
+      setFetching(false);
+    }
+  }
 
   function buildCommand(): TestCommand | null {
     switch (type) {
@@ -161,22 +283,58 @@ export function AddCommandForm({ onAdd }: Props) {
       </Text>
 
       {(type === 'wait' || type === 'deltatime') && (
-        <NumberInput
-          label={type === 'wait' ? 'Seconds' : 'Delta time'}
-          value={numValue}
-          onChange={setNumValue}
-          min={0}
-          step={type === 'wait' ? 1 : 0.1}
-        />
+        <Stack gap={'xs'}>
+          <NumberInput
+            label={type === 'wait' ? 'Seconds' : 'Delta time'}
+            value={numValue}
+            onChange={setNumValue}
+            min={0}
+            step={type === 'wait' ? 1 : 0.1}
+          />
+          {type === 'deltatime' && (
+            <Button
+              size={'xs'}
+              variant={'light'}
+              onClick={() => void fetchDeltaTime()}
+              disabled={!library}
+              loading={fetching}
+            >
+              Fetch from OpenSpace
+            </Button>
+          )}
+        </Stack>
       )}
 
       {type === 'asset' && (
-        <TextInput
-          label={'Asset path'}
-          placeholder={'scene/solarsystem/planets/earth/earth'}
-          value={strValue}
-          onChange={(e) => setStrValue(e.currentTarget.value)}
-        />
+        <Stack gap={'xs'}>
+          {assetOptions.length > 0 ? (
+            <Select
+              label={'Asset'}
+              data={assetOptions}
+              value={strValue}
+              onChange={(v) => {
+                if (v) setStrValue(v);
+              }}
+              searchable
+            />
+          ) : (
+            <TextInput
+              label={'Asset path'}
+              placeholder={'scene/solarsystem/planets/earth/earth'}
+              value={strValue}
+              onChange={(e) => setStrValue(e.currentTarget.value)}
+            />
+          )}
+          <Button
+            size={'xs'}
+            variant={'light'}
+            onClick={() => void fetchAssets()}
+            disabled={!library}
+            loading={fetching}
+          >
+            Load assets from OpenSpace
+          </Button>
+        </Stack>
       )}
 
       {type === 'script' && (
@@ -191,21 +349,55 @@ export function AddCommandForm({ onAdd }: Props) {
       )}
 
       {type === 'time' && (
-        <TextInput
-          label={'UTC time'}
-          placeholder={'2021-01-01T00:00:00'}
-          value={strValue}
-          onChange={(e) => setStrValue(e.currentTarget.value)}
-        />
+        <Stack gap={'xs'}>
+          <TextInput
+            label={'UTC time'}
+            placeholder={'2021-01-01T00:00:00'}
+            value={strValue}
+            onChange={(e) => setStrValue(e.currentTarget.value)}
+          />
+          <Button
+            size={'xs'}
+            variant={'light'}
+            onClick={() => void fetchTime()}
+            disabled={!library}
+            loading={fetching}
+          >
+            Fetch from OpenSpace
+          </Button>
+        </Stack>
       )}
 
       {type === 'action' && (
-        <TextInput
-          label={'Action identifier'}
-          placeholder={'profile.action.identifier'}
-          value={strValue}
-          onChange={(e) => setStrValue(e.currentTarget.value)}
-        />
+        <Stack gap={'xs'}>
+          {actionOptions.length > 0 ? (
+            <Select
+              label={'Action'}
+              data={actionOptions}
+              value={strValue}
+              onChange={(v) => {
+                if (v) setStrValue(v);
+              }}
+              searchable
+            />
+          ) : (
+            <TextInput
+              label={'Action identifier'}
+              placeholder={'profile.action.identifier'}
+              value={strValue}
+              onChange={(e) => setStrValue(e.currentTarget.value)}
+            />
+          )}
+          <Button
+            size={'xs'}
+            variant={'light'}
+            onClick={() => void fetchActions()}
+            disabled={!library}
+            loading={fetching}
+          >
+            Load actions from OpenSpace
+          </Button>
+        </Stack>
       )}
 
       {type === 'pause' && (
@@ -224,18 +416,40 @@ export function AddCommandForm({ onAdd }: Props) {
             value={propUri}
             onChange={(e) => setPropUri(e.currentTarget.value)}
           />
-          <TextInput
-            label={'Value'}
-            description={'Enter true/false for booleans, a number, or a string value.'}
-            placeholder={'true'}
-            value={propRawValue}
-            onChange={(e) => setPropRawValue(e.currentTarget.value)}
-          />
+          <Group align={'flex-end'} gap={'xs'}>
+            <TextInput
+              style={{ flex: 1 }}
+              label={'Value'}
+              description={'Enter true/false for booleans, a number, or a string value.'}
+              placeholder={'true'}
+              value={propRawValue}
+              onChange={(e) => setPropRawValue(e.currentTarget.value)}
+            />
+            <Button
+              size={'sm'}
+              variant={'light'}
+              onClick={() => void fetchPropertyValue()}
+              disabled={!propUri}
+              loading={fetching}
+              mb={'xs'}
+            >
+              Fetch value
+            </Button>
+          </Group>
         </Stack>
       )}
 
       {type === 'navigationstate' && (
         <Stack gap={'xs'}>
+          <Button
+            size={'xs'}
+            variant={'light'}
+            onClick={() => void fetchNavState()}
+            disabled={!library}
+            loading={fetching}
+          >
+            Fetch current camera state from OpenSpace
+          </Button>
           <TextInput
             label={'Anchor'}
             placeholder={'Earth'}
