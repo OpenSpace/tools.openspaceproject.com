@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "masteraddress": "localhost",
+  "users": [
+    {
+      "eyeseparation": 0.06,
+      "pos": {
+        "x": 0,
+        "y": 0,
+        "z": 4
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "address": "localhost",
+      "port": 20401,
+      "windows": [
+        {
+          "msaa": 1,
+          "border": true,
+          "fullscreen": false,
+          "pos": {
+            "x": 10,
+            "y": 100
+          },
+          "size": {
+            "x": 320,
+            "y": 480
+          },
+          "viewports": [
+            {
+              "pos": {
+                "x": 0,
+                "y": 0
+              },
+              "size": {
+                "x": 1,
+                "y": 1
+              },
+              "projection": {
+                "type": "ProjectionPlane",
+                "lowerleft": {
+                  "x": -1.778,
+                  "y": -1,
+                  "z": 0
+                },
+                "upperleft": {
+                  "x": -1.778,
+                  "y": 1,
+                  "z": 0
+                },
+                "upperright": {
+                  "x": 0,
+                  "y": 1,
+                  "z": 0
+                }
+              }
+            }
+          ]
+        },
+        {
+          "msaa": 1,
+          "border": false,
+          "fullscreen": false,
+          "pos": {
+            "x": 340,
+            "y": 100
+          },
+          "size": {
+            "x": 320,
+            "y": 480
+          },
+          "viewports": [
+            {
+              "pos": {
+                "x": 0,
+                "y": 0
+              },
+              "size": {
+                "x": 1,
+                "y": 1
+              },
+              "projection": {
+                "type": "ProjectionPlane",
+                "lowerleft": {
+                  "x": 0,
+                  "y": -1,
+                  "z": 0
+                },
+                "upperleft": {
+                  "x": 0,
+                  "y": 1,
+                  "z": 0
+                },
+                "upperright": {
+                  "x": 1.778,
+                  "y": 1,
+                  "z": 0
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
