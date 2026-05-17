@@ -233,5 +233,6 @@ export function toObject(obj: object, key: string) {
   if (typeof val !== 'object') throw `Wrong type for key ${key}`;
   if (val.length !== 1) throw `Wrong length ${val.length} for key ${key}`;
 
-  (obj as any)[key] = val[0];
+  const [v] = val;
+  (obj as any)[key] = v;
 }

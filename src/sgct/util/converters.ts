@@ -11,10 +11,18 @@ import {
   toVec3
 } from './converter_helpers';
 import { convertXmlToJson } from './helper';
-import { Sgct as config } from './sgct';
+import {
+  Node,
+  Orientation,
+  Sgct as SGCTConfig,
+  TextureMappedProjection,
+  Viewport,
+  Window,
+  YawPitchRoll
+} from './sgct';
 import schema from './sgct.schema.json';
 
-function convertVersion(obj: any): config {
+function convertVersion(obj: any): SGCTConfig {
   // The current data version
   const CurrentVersion = 1;
 
@@ -522,17 +530,18 @@ function convertVersion(obj: any): config {
             toObject(viewport, 'projection');
             viewport.projection.type = 'ProjectionPlane';
 
-            viewport.projection.lowerleft = viewport.projection.Pos[0];
+            const [lowerleft, upperleft, upperright] = viewport.projection.Pos;
+            viewport.projection.lowerleft = lowerleft;
             Object.keys(viewport.projection.lowerleft).forEach((key) => {
               toNumber(viewport.projection.lowerleft, key);
             });
 
-            viewport.projection.upperleft = viewport.projection.Pos[1];
+            viewport.projection.upperleft = upperleft;
             Object.keys(viewport.projection.upperleft).forEach((key) => {
               toNumber(viewport.projection.upperleft, key);
             });
 
-            viewport.projection.upperright = viewport.projection.Pos[2];
+            viewport.projection.upperright = upperright;
             Object.keys(viewport.projection.upperright).forEach((key) => {
               toNumber(viewport.projection.upperright, key);
             });
@@ -547,20 +556,22 @@ function convertVersion(obj: any): config {
   return obj;
 }
 
-function convertFromMpcdi(obj: any): config {
+function convertFromMpcdi(obj: any): SGCTConfig {
   // The current data version
   const CurrentVersion = 1;
 
-  obj.version = CurrentVersion;
-  obj['masteraddress'] = 'DSHOST';
-  obj['firmsync'] = false;
-  obj['users'] = [
-    {
-      eyeseparation: 0.065,
-      pos: { x: 0.0, y: 0.0, z: 0.0 }
-    }
-  ];
-  obj['settings'] = { display: { swapinterval: 0 } };
+  const res: SGCTConfig = {
+    version: CurrentVersion,
+    masteraddress: 'DSHOST',
+    firmsync: false,
+    users: [
+      {
+        eyeseparation: 0.065,
+        pos: { x: 0.0, y: 0.0, z: 0.0 }
+      }
+    ],
+    settings: { display: { swapinterval: 0 } }
+  };
 
   const nodePrefix = 'surface';
   const warpArray: string[] = [];
@@ -578,104 +589,96 @@ function convertFromMpcdi(obj: any): config {
       });
     });
   }
-  const nodes: object[] = [];
+  const nodes: Node[] = [];
   // Obtain display information for each node
   if ('display' in obj) {
     obj.display.forEach((displayElem: any) => {
       if ('buffer' in displayElem) {
         displayElem.buffer.forEach((buffElem: any) => {
-          const node: any = {};
-          const windowElem: any = {};
+          const node = {} as Node;
           if ('id' in buffElem) {
             let [nodeNum] = buffElem.id;
             nodeNum = Number(nodeNum.substring(nodePrefix.length));
-            node['address'] = `DSGP${nodeNum}`;
-            node['port'] = 20400 + nodeNum;
-            node['name'] = `DSGP${nodeNum}`;
-            node['swaplock'] = false;
+            node.address = `DSGP${nodeNum}`;
+            node.port = 20400 + nodeNum;
+            node.swaplock = false;
 
-            windowElem['border'] = false;
-            windowElem['fxaa'] = false;
-            windowElem['msaa'] = 1;
+            const window = {} as Window;
+            window.border = false;
+            window.fxaa = false;
+            window.msaa = 1;
             if ('region' in buffElem) {
               const [region] = buffElem['region'];
-              windowElem['pos'] = { x: 0, y: 0 };
+              window.pos = { x: 0, y: 0 };
               if ('xResolution' in buffElem && 'yResolution' in buffElem) {
                 const x = parseInt(buffElem.xResolution);
                 const y = parseInt(buffElem.yResolution);
-                windowElem['size'] = { x: x, y: y };
-                //Double the resolution for rendering due to the texture shape(s)
-                windowElem['res'] = { x: x * 2, y: y * 2 };
+                window.size = { x: x, y: y };
+                // Double the resolution for rendering due to the texture shape(s)
+                window.res = { x: x * 2, y: y * 2 };
               }
-              const viewport: any = {};
-              viewport['tracked'] = true;
+              const viewport: Viewport = {
+                tracked: true
+              };
               if (nodeNum <= warpArray.length) {
-                viewport['mesh'] = `mesh/${warpArray[nodeNum - 1]}`;
+                viewport.mesh = `mesh/${warpArray[nodeNum - 1]}`;
               }
               if ('x' in region && 'y' in region) {
                 const x = parseFloat(region['x'][0]);
                 const y = parseFloat(region['y'][0]);
-                viewport['pos'] = { x: x, y: y };
+                viewport.pos = { x: x, y: y };
               }
               if ('xSize' in region && 'ySize' in region) {
                 const xSize = parseFloat(region['xSize'][0]);
                 const ySize = parseFloat(region['ySize'][0]);
-                viewport['size'] = { x: xSize, y: ySize };
+                viewport.size = { x: xSize, y: ySize };
               }
 
-              const projection: any = {};
-              projection['type'] = 'TextureMappedProjection';
-              if ('frustum' in region) {
-                const [frustum] = region['frustum'];
+              const parseOrientation = (frustum: any) => {
+                if ('yaw' in frustum || 'pitch' in frustum || 'roll' in frustum) {
+                  const orientation = {} as YawPitchRoll;
+                  if ('yaw' in frustum) {
+                    orientation.yaw = parseFloat(frustum.yaw[0]);
+                  }
+                  if ('pitch' in frustum) {
+                    orientation.pitch = parseFloat(frustum.pitch[0]);
+                  }
+                  if ('roll' in frustum) {
+                    orientation.roll = parseFloat(frustum.roll[0]);
+                  }
+                  return orientation as Orientation;
+                } else {
+                  return null;
+                }
+              };
 
-                projection['fov'] = {};
-                if ('downAngle' in frustum) {
-                  projection['fov'].down = Math.abs(parseFloat(frustum.downAngle[0]));
+              const [frustum] = region['frustum'];
+              const projection: TextureMappedProjection = {
+                type: 'TextureMappedProjection',
+                fov: {
+                  down: Math.abs(parseFloat(frustum.downAngle[0])),
+                  up: Math.abs(parseFloat(frustum.upAngle[0])),
+                  left: Math.abs(parseFloat(frustum.leftAngle[0])),
+                  right: Math.abs(parseFloat(frustum.rightAngle[0]))
                 }
-                if ('upAngle' in frustum) {
-                  projection['fov'].up = Math.abs(parseFloat(frustum.upAngle[0]));
-                }
-                if ('leftAngle' in frustum) {
-                  projection['fov'].left = Math.abs(parseFloat(frustum.leftAngle[0]));
-                }
-                if ('rightAngle' in frustum) {
-                  projection['fov'].right = Math.abs(parseFloat(frustum.rightAngle[0]));
-                }
-
-                projection['orientation'] = {};
-                if ('yaw' in frustum) {
-                  projection['orientation'].yaw = parseFloat(frustum.yaw[0]);
-                }
-                if ('pitch' in frustum) {
-                  projection['orientation'].pitch = parseFloat(frustum.pitch[0]);
-                }
-                if ('roll' in frustum) {
-                  projection['orientation'].roll = parseFloat(frustum.roll[0]);
-                }
+              };
+              const parsedOrientation = parseOrientation(frustum);
+              if (parsedOrientation !== null) {
+                projection.orientation = parsedOrientation;
               }
 
               viewport['projection'] = projection;
-              windowElem['viewports'] = [];
-              windowElem['viewports'].push(viewport);
+              window.viewports = [viewport];
             }
-            node['windows'] = [windowElem];
+            node['windows'] = [window];
           }
           nodes.push(node);
         });
       }
     });
   }
-  obj['nodes'] = nodes;
-
-  //Remove extra fields from original mpcdi file
-  delete obj.color;
-  delete obj.date;
-  delete obj.files;
-  delete obj.geometry;
-  delete obj.profile;
-  delete obj.display;
-
-  return obj;
+  res.nodes = nodes;
+  return res;
 }
 
 /**
