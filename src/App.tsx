@@ -13,6 +13,15 @@ export default function App() {
       </Title>
 
       <PageSection
+        title={'Regression Tests'}
+        description={
+          'Create OpenSpace visual regression test files (.ostest) by building up a sequence of commands. The test can then be run by the OpenSpace test framework.'
+        }
+      >
+        <TestWizard />
+      </PageSection>
+
+      <PageSection
         title={'SGCT Converters'}
         description={
           'Tools for converting SGCT configuration files between formats and versions and support conversions between vendor-specific configuration files into SGCT configuration files.'
@@ -20,15 +29,6 @@ export default function App() {
       >
         <SgctVersionConverter />
         <CosmConverter />
-      </PageSection>
-
-      <PageSection
-        title={'Regression Tests'}
-        description={
-          'Create OpenSpace visual regression test files (.ostest) by building up a sequence of commands. The test can then be run by the OpenSpace test framework.'
-        }
-      >
-        <TestWizard />
       </PageSection>
 
       <div className={'logo-container'}>

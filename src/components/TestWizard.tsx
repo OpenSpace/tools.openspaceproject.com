@@ -267,10 +267,10 @@ export function TestWizard() {
         onChange={handleLoadFile}
       />
       <Group grow>
-        <Button onClick={handleDownload} disabled={!profile || !name}>
+        <Button color={'teal'} onClick={handleDownload} disabled={!profile || !name}>
           Download .ostest
         </Button>
-        <Button variant={'light'} onClick={() => fileInputRef.current?.click()}>
+        <Button color={'violet'} variant={'light'} onClick={() => fileInputRef.current?.click()}>
           Load .ostest
         </Button>
       </Group>

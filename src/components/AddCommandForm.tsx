@@ -274,7 +274,12 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
         data={COMMAND_OPTIONS}
         value={type}
         onChange={(v) => {
-          if (v) setType(v);
+          if (!v) return;
+          setType(v);
+          setStrValue('');
+          setNumValue(0);
+          setAssetOptions([]);
+          setActionOptions([]);
         }}
         allowDeselect={false}
       />
