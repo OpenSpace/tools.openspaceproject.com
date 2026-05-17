@@ -3,10 +3,8 @@ import { Alert, Anchor, Button, FileInput, Group, Stack, Text } from '@mantine/c
 
 import { readFile } from '../util/sgct/helper';
 
-type ConverterFn = (content: string, filename: string) => Promise<string>;
-
 interface Props {
-  convert: ConverterFn;
+  convert: (content: string, filename: string) => Promise<string>;
   accept: string;
 }
 

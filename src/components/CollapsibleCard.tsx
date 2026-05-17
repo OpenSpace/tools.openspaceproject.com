@@ -15,7 +15,12 @@ export function CollapsibleCard({ title, children }: Props) {
         order={2}
         {...(open ? { mb: 'xs' } : {})}
         onClick={() => setOpen((o) => !o)}
-        style={{ cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center' }}
+        style={{
+          cursor: 'pointer',
+          userSelect: 'none',
+          display: 'flex',
+          alignItems: 'center'
+        }}
       >
         <span
           style={{
@@ -27,7 +32,7 @@ export function CollapsibleCard({ title, children }: Props) {
             height: 0,
             borderTop: '7px solid transparent',
             borderBottom: '7px solid transparent',
-            borderLeft: '12px solid #228be6',
+            borderLeft: '12px solid #228be6'
           }}
         />
         {title}

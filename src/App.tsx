@@ -1,8 +1,8 @@
 import { Container, Title } from '@mantine/core';
 
 import { CosmConverter } from './components/CosmConverter';
-import { SgctVersionConverter } from './components/SgctVersionConverter';
 import { PageSection } from './components/PageSection';
+import { SgctVersionConverter } from './components/SgctVersionConverter';
 
 export default function App() {
   return (
