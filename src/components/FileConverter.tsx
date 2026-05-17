@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Anchor, Button, FileInput, Group, Stack, Text } from '@mantine/core';
 
-import { readFile } from '../util/helper';
+import { readFile } from '../util/sgct/helper';
 
 type ConverterFn = (content: string, filename: string) => Promise<string>;
 

@@ -1,7 +1,8 @@
-import { Card, Text, Title } from '@mantine/core';
+import { Text } from '@mantine/core';
 
-import { convertFileVersion } from '../util/converters';
+import { convertFileVersion } from '../util/sgct/converters';
 
+import { CollapsibleCard } from './CollapsibleCard';
 import { FileConverter } from './FileConverter';
 
 async function versionConverter(content: string, filename: string): Promise<string> {
@@ -11,15 +12,12 @@ async function versionConverter(content: string, filename: string): Promise<stri
 
 export function SgctVersionConverter() {
   return (
-    <Card shadow={'sm'} padding={'md'} radius={'md'} withBorder>
-      <Title order={2} mb={'xs'}>
-        SGCT Configuration Version Converter
-      </Title>
+    <CollapsibleCard title={'SGCT Configuration Version Converter'}>
       <Text mb={'xs'}>
         This converter is used to update SGCT configuration files from older versions to
         the newest supported version.
       </Text>
       <FileConverter convert={versionConverter} accept={'.xml,.json'} />
-    </Card>
+    </CollapsibleCard>
   );
 }

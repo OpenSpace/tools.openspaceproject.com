@@ -1,7 +1,8 @@
-import { Container, Stack, Title } from '@mantine/core';
+import { Container, Title } from '@mantine/core';
 
-import { CosmConverter } from './sgct/components/CosmConverter';
-import { SgctVersionConverter } from './sgct/components/SgctVersionConverter';
+import { CosmConverter } from './components/CosmConverter';
+import { SgctVersionConverter } from './components/SgctVersionConverter';
+import { PageSection } from './components/PageSection';
 
 export default function App() {
   return (
@@ -10,10 +11,15 @@ export default function App() {
         OpenSpace Conversion Functions
       </Title>
 
-      <Stack>
+      <PageSection
+        title={'SGCT Converters'}
+        description={
+          'Tools for converting SGCT configuration files between formats and versions and support conversions between vendor-specific configuration files into SGCT configuration files.'
+        }
+      >
         <SgctVersionConverter />
         <CosmConverter />
-      </Stack>
+      </PageSection>
 
       <div className={'logo-container'}>
         <img
