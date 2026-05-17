@@ -50,7 +50,7 @@ function parseVec3(s: string): Vec3 | null {
   return [x, y, z];
 }
 
-interface OsNavState {
+interface NavState {
   Anchor: string;
   Position: Vec3;
   Aim?: string;
@@ -61,7 +61,7 @@ interface OsNavState {
   Yaw?: number;
 }
 
-interface OsAction {
+interface Action {
   Identifier: string;
   Name: string;
 }
@@ -74,21 +74,11 @@ interface Props {
 
 export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   const [type, setType] = useState<string | null>(null);
-
-  // wait / deltatime
   const [numValue, setNumValue] = useState<number | string>(0);
-
-  // asset / script / time / action
   const [strValue, setStrValue] = useState('');
-
-  // pause
   const [pauseValue, setPauseValue] = useState(true);
-
-  // property
   const [propUri, setPropUri] = useState('');
   const [propRawValue, setPropRawValue] = useState('');
-
-  // navigationstate
   const [navAnchor, setNavAnchor] = useState('');
   const [navPosition, setNavPosition] = useState('');
   const [navAim, setNavAim] = useState('');
@@ -99,7 +89,6 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   const [navTimestamp, setNavTimestamp] = useState('');
   const [navIncludeTimestamp, setNavIncludeTimestamp] = useState(false);
 
-  // live-fetch state
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [assetOptions, setAssetOptions] = useState<string[]>([]);
@@ -109,121 +98,104 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
 
   async function fetchNavState() {
     if (!library) return;
+
     setFetching(true);
     setFetchError(null);
-    try {
-      const navstate = (await library.navigation.getNavigationState()) as OsNavState;
-      setNavAnchor(navstate.Anchor);
-      setNavPosition(navstate.Position.join(', '));
-      if (navstate.Aim !== undefined) setNavAim(navstate.Aim);
-      if (navstate.Pitch !== undefined) setNavPitch(navstate.Pitch);
-      if (navstate.ReferenceFrame !== undefined) setNavRefFrame(navstate.ReferenceFrame);
-      if (navstate.Up !== undefined) setNavUp(navstate.Up.join(', '));
-      if (navstate.Yaw !== undefined) setNavYaw(navstate.Yaw);
-      if (navstate.Timestamp !== undefined) {
-        setNavTimestamp(navstate.Timestamp);
-        setNavIncludeTimestamp(true);
-      }
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch navigation state');
-    } finally {
-      setFetching(false);
+
+    const navstate = (await library.navigation.getNavigationState()) as NavState;
+    setNavAnchor(navstate.Anchor);
+    setNavPosition(navstate.Position.join(', '));
+    if (navstate.Aim !== undefined) setNavAim(navstate.Aim);
+    if (navstate.Pitch !== undefined) setNavPitch(navstate.Pitch);
+    if (navstate.ReferenceFrame !== undefined) setNavRefFrame(navstate.ReferenceFrame);
+    if (navstate.Up !== undefined) setNavUp(navstate.Up.join(', '));
+    if (navstate.Yaw !== undefined) setNavYaw(navstate.Yaw);
+    if (navstate.Timestamp !== undefined) {
+      setNavTimestamp(navstate.Timestamp);
+      setNavIncludeTimestamp(true);
     }
+
+    setFetching(false);
   }
 
   async function fetchTime() {
     if (!library) return;
     setFetching(true);
     setFetchError(null);
-    try {
-      setStrValue(await library.time.UTC());
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch time');
-    } finally {
-      setFetching(false);
-    }
+
+    setStrValue(await library.time.UTC());
+
+    setFetching(false);
   }
 
   async function fetchDeltaTime() {
     if (!library) return;
     setFetching(true);
     setFetchError(null);
-    try {
-      setNumValue(await library.time.deltaTime());
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch delta time');
-    } finally {
-      setFetching(false);
-    }
+
+    setNumValue(await library.time.deltaTime());
+
+    setFetching(false);
   }
 
   async function fetchPropertyValue() {
     if (!propUri) return;
     setFetching(true);
     setFetchError(null);
-    try {
-      const result = (await getProperty(propUri)) as {
-        type: string;
-        value: { value: unknown };
-      };
-      if (result.type === 'property') {
-        setPropRawValue(String(result.value.value));
-      }
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch property value');
-    } finally {
-      setFetching(false);
+
+    const result = (await getProperty(propUri)) as {
+      type: string;
+      value: { value: unknown };
+    };
+    if (result.type === 'property') {
+      setPropRawValue(String(result.value.value));
     }
+
+    setFetching(false);
   }
 
   async function fetchAssets() {
     if (!library) return;
     setFetching(true);
     setFetchError(null);
-    try {
-      // eslint-disable-next-line no-template-curly-in-string
-      const folder = await library.absPath('${ASSETS}');
-      const rawAssets = await library.asset.rootAssets();
-      const all = Object.values(rawAssets as Record<number, string>);
-      const names = all
-        .map((a) => {
-          const relative = a.startsWith(folder) ? a.slice(folder.length + 1) : a;
-          const dotIdx = relative.indexOf('.');
-          return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(
-            /\\/g,
-            '/'
-          );
-        })
-        .sort();
-      setAssetOptions(names);
-      const [first] = names;
-      if (first) setStrValue(first);
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch assets');
-    } finally {
-      setFetching(false);
-    }
+
+    // eslint-disable-next-line no-template-curly-in-string
+    const folder = await library.absPath('${ASSETS}');
+    const rawAssets = await library.asset.rootAssets();
+    const all = Object.values(rawAssets as Record<number, string>);
+    const names = all
+      .map((a) => {
+        const relative = a.startsWith(folder) ? a.slice(folder.length + 1) : a;
+        const dotIdx = relative.indexOf('.');
+        return (dotIdx !== -1 ? relative.slice(0, dotIdx) : relative).replace(
+          /\\/g,
+          '/'
+        );
+      })
+      .sort();
+    setAssetOptions(names);
+    const [first] = names;
+    if (first) setStrValue(first);
+
+    setFetching(false);
   }
 
   async function fetchActions() {
     if (!library) return;
     setFetching(true);
     setFetchError(null);
-    try {
-      const rawActions = await library.action.actions();
-      const actions = Object.values(rawActions as Record<number, OsAction>);
-      const opts = actions.map((a) => ({
-        value: a.Identifier,
-        label: `${a.Name} (${a.Identifier})`
-      }));
-      setActionOptions(opts);
-      const [first] = opts;
-      if (first) setStrValue(first.value);
-    } catch (e) {
-      setFetchError(e instanceof Error ? e.message : 'Failed to fetch actions');
-    } finally {
-      setFetching(false);
-    }
+
+    const rawActions = await library.action.actions();
+    const actions = Object.values(rawActions as Record<number, Action>);
+    const opts = actions.map((a) => ({
+      value: a.Identifier,
+      label: `${a.Name} (${a.Identifier})`
+    }));
+    setActionOptions(opts);
+    const [first] = opts;
+    if (first) setStrValue(first.value);
+
+    setFetching(false);
   }
 
   function buildCommand(): TestCommand | null {
