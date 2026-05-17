@@ -116,9 +116,13 @@ export function TestWizard() {
         setCommands(cmds);
         const fileName = file.name.replace(/\.ostest$/i, '');
         setName(fileName);
-      } catch {
-        // ignore malformed files
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error';
+        window.alert(`Failed to load test file "${file.name}". Please choose a valid .ostest file.\n\n${message}`);
       }
+    };
+    reader.onerror = () => {
+      window.alert(`Failed to read test file "${file.name}". Please try again.`);
     };
     reader.readAsText(file);
     e.target.value = '';
