@@ -110,11 +110,18 @@ export function TestWizard() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       try {
-        const test = JSON.parse(ev.target?.result as string) as OsTest;
-        setProfile(test.profile ?? '');
+        const parsed = JSON.parse(ev.target?.result as string) as unknown;
+        if (!parsed || typeof parsed !== 'object' || !Array.isArray((parsed as { commands?: unknown }).commands)) {
+          return;
+        }
+
+        const test = parsed as { profile?: unknown; commands: TestCommand[] };
+        const nextProfile = typeof test.profile === 'string' ? test.profile : '';
         const cmds = test.commands.filter((c) => c.type !== 'screenshot');
-        setCommands(cmds);
         const fileName = file.name.replace(/\.ostest$/i, '');
+
+        setProfile(nextProfile);
+        setCommands(cmds);
         setName(fileName);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
