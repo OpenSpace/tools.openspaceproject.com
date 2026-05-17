@@ -73,7 +73,7 @@ interface Props {
 }
 
 export function AddCommandForm({ library, getProperty, onAdd }: Props) {
-  const [type, setType] = useState('wait');
+  const [type, setType] = useState<string | null>(null);
 
   // wait / deltatime
   const [numValue, setNumValue] = useState<number | string>(0);
@@ -270,6 +270,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
   }
 
   function resetForm() {
+    setType(null);
     setStrValue('');
     setNumValue(0);
     setPropUri('');
@@ -301,10 +302,10 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
       )}
       <Select
         label={'Command type'}
+        placeholder={'Select a command type...'}
         data={COMMAND_OPTIONS}
         value={type}
         onChange={(v) => {
-          if (!v) return;
           setType(v);
           setStrValue('');
           setNumValue(0);
@@ -313,11 +314,13 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
         }}
         allowDeselect={false}
       />
-      <Text size={'sm'} c={'dimmed'}>
-        {COMMAND_DESCRIPTIONS[type] ?? ''}
-      </Text>
+      {type !== null && (
+        <Text size={'sm'} c={'dimmed'}>
+          {COMMAND_DESCRIPTIONS[type] ?? ''}
+        </Text>
+      )}
 
-      {(type === 'wait' || type === 'deltatime') && (
+      {type !== null && (type === 'wait' || type === 'deltatime') && (
         <Stack gap={'xs'}>
           <NumberInput
             label={type === 'wait' ? 'Seconds' : 'Delta time'}
@@ -538,7 +541,7 @@ export function AddCommandForm({ library, getProperty, onAdd }: Props) {
         </Stack>
       )}
 
-      <Button onClick={handleAdd}>Add command</Button>
+      {type !== null && <Button onClick={handleAdd}>Add command</Button>}
     </Stack>
   );
 }
