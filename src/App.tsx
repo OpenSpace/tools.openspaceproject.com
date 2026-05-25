@@ -3,6 +3,7 @@ import { Container, Title } from '@mantine/core';
 import { CosmConverter } from './components/CosmConverter';
 import { PageSection } from './components/PageSection';
 import { SgctVersionConverter } from './components/SgctVersionConverter';
+import { TestWizard } from './components/TestWizard';
 
 export default function App() {
   return (
@@ -10,6 +11,15 @@ export default function App() {
       <Title order={1} ta={'center'} mb={'md'}>
         OpenSpace Conversion Functions
       </Title>
+
+      <PageSection
+        title={'Regression Tests'}
+        description={
+          'Create OpenSpace visual regression test files (.ostest) by building up a sequence of commands. The test can then be run by the OpenSpace test framework.'
+        }
+      >
+        <TestWizard />
+      </PageSection>
 
       <PageSection
         title={'SGCT Converters'}
