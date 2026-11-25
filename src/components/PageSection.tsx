@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Stack, Text, Title } from '@mantine/core';
 
 interface Props {

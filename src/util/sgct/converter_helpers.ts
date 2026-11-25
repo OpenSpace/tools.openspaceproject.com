@@ -170,7 +170,7 @@ export function toMat4(obj: object, key: string) {
 
   const [vs] = val;
 
-  let values = [];
+  let values: number[];
   toBoolean(obj, 'transpose');
   if ((obj as any)['transpose']) {
     values = [

@@ -10,4 +10,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Deploy
 
-When finishing development and wanting to deploy, you'll need to run `npm run build` and _also commit_ the `out` folder. The server that is serving the webpage does not have sufficiently modern NodeJS to compile the page itself, so we need to feed it the compiled version.
+When finishing development and wanting to deploy, you'll need to run `npm run build` and *also commit* the `out` folder. The server that is serving the webpage does not have sufficiently modern NodeJS to compile the page itself, so we need to feed it the compiled version.

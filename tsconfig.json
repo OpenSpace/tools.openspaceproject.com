@@ -1,25 +1,9 @@
 {
+  "extends": "@openspace/shared-configs/tsconfig.vite.json",
+
   "compilerOptions": {
-    "target": "es2022",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react-jsx",
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-    "useUnknownInCatchVariables": true,
+    // The type generation script and the tests run in Node through `tsx`
+    "types": ["vite/client", "node"],
     "paths": {
       "@/*": ["./src/*"]
     }

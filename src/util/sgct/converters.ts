@@ -11,7 +11,7 @@ import {
   toVec3
 } from './converter_helpers';
 import { convertXmlToJson } from './helper';
-import {
+import type {
   Node,
   Orientation,
   Sgct as SGCTConfig,

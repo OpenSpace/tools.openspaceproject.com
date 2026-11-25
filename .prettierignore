@@ -1,2 +1,11 @@
+# Build output and dependencies
+dist
+node_modules
+package-lock.json
+
+# Generated from the SGCT schema by `npm run generate`
 src/util/sgct/sgct.d.ts
 src/util/sgct/sgct.schema.json
+
+# Markdown is checked by markdownlint, whose list indentation differs from Prettier's
+*.md
